@@ -3,27 +3,13 @@
     <!-- 查询和其他操作 -->
     <div class="filter-container">
       <el-input
-        v-model="listQuery.username"
+        v-model="listQuery.name"
         clearable
         class="filter-item"
         style="width: 200px;"
         placeholder="请输入用户名"
       />
-      <el-input
-        v-model="listQuery.mobile"
-        clearable
-        class="filter-item"
-        style="width: 200px;"
-        placeholder="请输入手机号"
-      />
-      <el-button class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">查找</el-button>
-      <!-- <el-button
-        :loading="downloadLoading"
-        class="filter-item"
-        type="primary"
-        icon="el-icon-download"
-        @click="handleDownload"
-      >导出</el-button>-->
+      <el-button class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">查询</el-button>
     </div>
 
     <!-- 查询结果 -->
@@ -36,42 +22,111 @@
       fit
       highlight-current-row
     >
-      <el-table-column align="center" width="100px" label="用户ID" prop="id" sortable/>
-      <el-table-column align="center" label="用户名" prop="username"/>
-      <el-table-column align="center" label="昵称" prop="nickname"/>
-      <el-table-column align="center" label="手机号" prop="mobile"/>
+      <el-table-column align="center" width="100px" label="用户ID" prop="id" sortable />
+      <el-table-column align="center" label="用户名" prop="username" />
+      <el-table-column align="center" label="昵称" prop="nickName" />
+      <el-table-column align="center" label="邮箱" prop="email" />
       <el-table-column align="center" label="头像">
         <template slot-scope="scope">
-          <img :src="scope.row.avatar" style="width: 50px;border-radius: 50%;" alt="头像">
+          <img :src="scope.row.icon" style="width: 50px;border-radius: 50%;" alt="头像" >
         </template>
       </el-table-column>
-      <el-table-column align="center" label="性别" prop="gender">
-        <template slot-scope="scope">
-          <el-tag>{{ genderDic[scope.row.gender] }}</el-tag>
-        </template>
-      </el-table-column>
-      <!-- <el-table-column align="center" label="生日" prop="birthday"/> -->
       <el-table-column align="center" label="状态" prop="status">
         <template slot-scope="scope">
           <el-tag>{{ statusDic[scope.row.status] }}</el-tag>
         </template>
       </el-table-column>
-      <el-table-column align="center" label="注册时间" prop="addTime"/>
-      <el-table-column align="center" label="最后登录时间" prop="lastLoginTime"/>
+      <el-table-column align="center" label="备注信息" prop="note" />
+      <el-table-column align="center" label="创建时间" min-width="130" prop="createTime" />
+      <el-table-column align="center" label="最后登录时间" min-width="130" prop="loginTime" />
+      <el-table-column align="center" label="操作" width="180" class-name="small-padding fixed-width">
+        <template slot-scope="{ row }">
+          <!-- <el-button
+            v-permission="['POST /admin/supper/standUpAndDown']"
+            v-if="row.isOnSale"
+            size="mini"
+            type="info"
+            @click="handleSetStatus(row)"
+          >下架</el-button>
+          <el-button
+            v-permission="['POST /admin/supper/standUpAndDown']"
+            v-else
+            size="mini"
+            type="primary"
+            @click="handleSetStatus(row)"
+          >上架</el-button>-->
+          <el-button type="primary" size="mini" @click="handleUpdate(row)">编辑</el-button>
+          <el-button type="danger" size="mini" @click="handleDelete(row)">删除</el-button>
+        </template>
+      </el-table-column>
     </el-table>
 
     <pagination
-      v-show="total>0"
+      v-show="total > 0"
       :total="total"
-      :page.sync="listQuery.page"
-      :limit.sync="listQuery.limit"
+      :page-num.sync="listQuery.pageNum"
+      :page-size.sync="listQuery.pageSize"
       @pagination="getList"
     />
+
+    <el-dialog :visible.sync="dialogFormVisible" title="编辑">
+      <el-form
+        ref="dataForm"
+        :rules="rules"
+        :model="temp"
+        label-position="left"
+        label-width="90px"
+        style="margin: 0 50px;"
+      >
+        <el-form-item label="头像：">
+          <el-upload
+            :http-request="fnUploadpicUrl"
+            :show-file-list="true"
+            :file-list="picUrl"
+            :on-remove="handleRemovePic"
+            :on-exceed="beyondFile"
+            :limit="1"
+            :before-upload="beforeAvatarUpload"
+            list-type="picture-card"
+            action
+          >
+            <i class="el-icon-plus" />
+          </el-upload>
+        </el-form-item>
+        <el-form-item label="用户名：" prop="username">
+          <el-input v-model="temp.username" placeholder="请输入用户名" />
+        </el-form-item>
+        <el-form-item label="昵称：" prop="nickName">
+          <el-input v-model="temp.nickName" placeholder="请输入昵称" />
+        </el-form-item>
+        <el-form-item label="邮箱：" prop="email">
+          <el-input v-model="temp.email" placeholder="请输入邮箱" />
+        </el-form-item>
+        <el-form-item label="状态：" prop="status">
+          <el-select v-model="temp.status" class="filter-item" placeholder="请选择">
+            <el-option
+              v-for="(item, index) in statusDic"
+              :key="index"
+              :label="item"
+              :value="index"
+            />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="备注信息：" prop="note">
+          <el-input v-model="temp.note" :rows="2" type="textarea" placeholder="请输入备注信息" />
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="dialogFormVisible = false">取消</el-button>
+        <el-button type="primary" @click="updateData()">确认</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
 <script>
-import { fetchList } from '@/api/user'
+import { fetchList, fetchDel, fetchEdit } from '@/api/user'
+import oss from '@/utils/aliOss'
 import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
 
 export default {
@@ -82,16 +137,35 @@ export default {
       list: null,
       total: 0,
       listLoading: true,
+      dialogFormVisible: false,
       listQuery: {
-        page: 1,
-        limit: 20,
-        username: undefined,
-        mobile: undefined
+        pageNum: 1,
+        pageSize: 20,
+        name: undefined
       },
-      downloadLoading: false,
-      genderDic: ['未知', '男', '女'],
-      levelDic: ['普通用户', 'VIP用户', '高级VIP用户'],
-      statusDic: ['可用', '禁用', '注销']
+      temp: {
+        id: undefined,
+        createTime: '',
+        email: '',
+        icon: '',
+        loginTime: '',
+        nickName: '',
+        note: '',
+        password: '',
+        status: undefined,
+        username: ''
+      },
+      picUrl: [],
+      statusDic: ['禁用', '启用'],
+      rules: {
+        username: [{ required: true, message: '请输入用户名', trigger: 'blur' }],
+        nickName: [{ required: true, message: '请输入昵称', trigger: 'blur' }],
+        status: [{ required: true, message: '请选择账号状态', trigger: 'change' }],
+        email: [
+          { required: true, message: '请输入邮箱地址', trigger: 'blur' },
+          { type: 'email', message: '请输入正确的邮箱地址', trigger: ['blur', 'change'] }
+        ]
+      }
     }
   },
   created() {
@@ -101,22 +175,95 @@ export default {
     getList() {
       this.listLoading = true
       fetchList(this.listQuery).then(response => {
-        this.list = response.data.data.items
-        this.total = response.data.data.total
+        this.list = response.data.list
+        this.total = response.data.total
         this.listLoading = false
       })
     },
     handleFilter() {
-      this.listQuery.page = 1
+      this.listQuery.pageNum = 1
       this.getList()
     },
-    handleDownload() {
-      this.downloadLoading = true
-      import('@/vendor/Export2Excel').then(excel => {
-        const tHeader = ['用户ID', '用户名', '昵称', '手机号', '头像', '性别', '生日', '状态', '注册时间', '最后登录时间']
-        const filterVal = ['id', 'username', 'nickname', 'mobile', 'avatar', 'gender', 'birthday', 'status', 'addTime', 'lastLoginTime']
-        excel.export_json_to_excel2(tHeader, this.list, filterVal, '用户信息')
-        this.downloadLoading = false
+    async fnUploadpicUrl(option) {
+      oss.ossUploadFile(option).then(res => {
+        this.picUrl = [{ url: res.fileUrl }]
+      })
+    },
+    beforeAvatarUpload(file) {
+      let isIMAGE = false
+      if (
+        file.type === 'image/jpeg' ||
+        file.type === 'image/gif' ||
+        file.type === 'image/png'
+      ) {
+        isIMAGE = true
+      }
+      if (!isIMAGE) {
+        this.$message.error('上传文件只能是图片格式!')
+      }
+      return isIMAGE
+    },
+    handleRemovePic(file, fileList) {
+      this.picUrl = []
+    },
+    // 添加多个文件事件
+    beyondFile(files, fileList) {
+      this.$message({
+        message: '最多上传' + fileList.length + '张图片',
+        type: 'error'
+      })
+    },
+    handleUpdate(row) {
+      this.temp = Object.assign({}, row)
+      var picUrl = []
+      picUrl.push({ url: row.icon })
+      this.picUrl = picUrl
+      this.dialogFormVisible = true
+      this.$nextTick(() => {
+        this.$refs['dataForm'].clearValidate()
+      })
+    },
+    updateData() {
+      this.$refs['dataForm'].validate(valid => {
+        if (valid) {
+          this.temp.icon = this.picUrl[0].url
+          const params = {
+            id: this.temp.id,
+            admin: this.temp
+          }
+          fetchEdit(params).then(res => {
+            for (const v of this.list) {
+              if (v.id === this.temp.id) {
+                const index = this.list.indexOf(v)
+                this.list.splice(index, 1, this.temp)
+                break
+              }
+            }
+            this.dialogFormVisible = false
+            this.$notify({
+              title: '成功',
+              message: '修改成功',
+              type: 'success',
+              duration: 2000
+            })
+          })
+        }
+      })
+    },
+    handleDelete(row) {
+      this.$confirm('是否删除用户 ' + row.username + ' ?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        fetchDel({ id: row.id }).then(response => {
+          const index = this.list.indexOf(row)
+          this.list.splice(index, 1)
+          this.$message({
+            type: 'success',
+            message: '删除成功!'
+          })
+        })
       })
     }
   }

@@ -53,7 +53,7 @@ const user = {
       const username = userInfo.username.trim()
       return new Promise((resolve, reject) => {
         loginByUsername(username, userInfo.password).then(response => {
-          const token = response.data
+          const token = response.data.token
           commit('SET_TOKEN', token)
           setToken(token)
           resolve()
@@ -66,8 +66,9 @@ const user = {
     // 获取用户信息
     GetUserInfo({ commit, state }) {
       return new Promise((resolve, reject) => {
-        getUserInfo().then(response => {
+        getUserInfo({ username: 'admin' }).then(response => {
           const data = response.data
+          data.perms = ['*']
           if (data.perms && data.perms.length > 0) { // 验证返回的perms是否是一个非空数组
             commit('SET_PERMS', data.perms)
           } else {
@@ -76,9 +77,10 @@ const user = {
 
           commit('SET_ROLES', data.roles)
           commit('SET_NAME', data.name)
-          commit('SET_AVATAR', data.avatar)
+          commit('SET_AVATAR', data.icon)
           commit('SET_CODE', data.number)
           commit('SET_INTRODUCTION', data.introduction)
+          // debugger
           resolve(response)
         }).catch(error => {
           reject(error)

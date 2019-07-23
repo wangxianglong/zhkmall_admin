@@ -48,5 +48,5 @@ export function deleteStorage(data) {
   })
 }
 
-const uploadPath = process.env.BASE_API + '/common/storage/verify/web'
+const uploadPath = process.env.BASE_API + '/aliyun/oss/policy'
 export { uploadPath }

@@ -1,7 +1,6 @@
 module.exports = {
 	NODE_ENV: '"development"',
   ENV_CONFIG: '"dev"',
-  // BASE_API: '"http://192.168.1.5:8080"'
-  BASE_API: '"http://zhkapi.fxz.ink"'
+  BASE_API: '"http://192.168.1.5:8080"'
 }
 

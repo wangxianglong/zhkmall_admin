@@ -1,11 +1,29 @@
 import request from '@/utils/request'
 
-// 会员列表
+// 用户列表
 export function fetchList(query) {
   return request({
-    url: '/admin/user/list',
+    url: '/admin/list',
     method: 'get',
     params: query
+  })
+}
+
+// 编辑用户
+export function fetchEdit(query) {
+  return request({
+    url: '/admin/update',
+    method: 'post',
+    data: query
+  })
+}
+
+// 删除用户
+export function fetchDel(query) {
+  return request({
+    url: '/admin/delete',
+    method: 'post',
+    data: query
   })
 }
 
