@@ -10,9 +10,9 @@ export function fetchList(query) {
 }
 
 // 编辑用户
-export function fetchEdit(query) {
+export function fetchEdit(id, query) {
   return request({
-    url: '/admin/update',
+    url: `/admin/update/${id}`,
     method: 'post',
     data: query
   })
@@ -21,9 +21,8 @@ export function fetchEdit(query) {
 // 删除用户
 export function fetchDel(query) {
   return request({
-    url: '/admin/delete',
-    method: 'post',
-    data: query
+    url: `/admin/delete/${query}`,
+    method: 'post'
   })
 }
 

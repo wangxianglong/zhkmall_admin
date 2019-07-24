@@ -9,17 +9,16 @@ export function listCategory(query) {
   })
 }
 // 删除商品类目
-export function delCategory(data) {
+export function delCategory(id) {
   return request({
-    url: '/admin/category/delete',
-    method: 'post',
-    data
+    url: `/productCategory/delete/${id}`,
+    method: 'post'
   })
 }
 // 添加商品类目
 export function addCategory(data) {
   return request({
-    url: '/admin/category/create',
+    url: '/productCategory/create',
     method: 'post',
     data
   })
@@ -44,7 +43,7 @@ export function editCategory(data) {
 // 商品管理列表
 export function listGoods(query) {
   return request({
-    url: '/admin/goods/list',
+    url: '/product/list',
     method: 'get',
     params: query
   })
@@ -52,7 +51,7 @@ export function listGoods(query) {
 // 删除商品
 export function deleteGoods(data) {
   return request({
-    url: '/admin/goods/delete',
+    url: '/product/update/deleteStatus',
     method: 'post',
     data
   })
@@ -60,7 +59,7 @@ export function deleteGoods(data) {
 // 添加商品
 export function publishGoods(data) {
   return request({
-    url: '/admin/goods/create',
+    url: '/product/create',
     method: 'post',
     data
   })
@@ -68,15 +67,14 @@ export function publishGoods(data) {
 // 商品详情
 export function detailGoods(id) {
   return request({
-    url: '/admin/goods/read',
-    method: 'get',
-    params: { id }
+    url: `/product/updateInfo/${id}`,
+    method: 'get'
   })
 }
 // 编辑商品
-export function editGoods(data) {
+export function editGoods(id, data) {
   return request({
-    url: '/admin/goods/update',
+    url: `/product/update/${id}`,
     method: 'post',
     data
   })
@@ -84,15 +82,32 @@ export function editGoods(data) {
 // 商品上下架
 export function upDownGoods(data) {
   return request({
-    url: '/admin/goods/standUpAndDown',
+    url: '/product/update/publishStatus',
     method: 'post',
     data
   })
 }
-
-export function listCatAndBrand() {
+// 推荐商品
+export function recommendStatus(data) {
   return request({
-    url: '/admin/goods/catAndBrand',
-    method: 'get'
+    url: '/product/update/recommendStatus',
+    method: 'post',
+    data
+  })
+}
+// 修改商品审核状态
+export function verifyStatus(data) {
+  return request({
+    url: '/product/update/verifyStatus',
+    method: 'post',
+    data
+  })
+}
+// 设为新品
+export function setNew(data) {
+  return request({
+    url: '/product/update/newStatus',
+    method: 'post',
+    data
   })
 }

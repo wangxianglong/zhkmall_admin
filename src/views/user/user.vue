@@ -227,11 +227,7 @@ export default {
       this.$refs['dataForm'].validate(valid => {
         if (valid) {
           this.temp.icon = this.picUrl[0].url
-          const params = {
-            id: this.temp.id,
-            admin: this.temp
-          }
-          fetchEdit(params).then(res => {
+          fetchEdit(this.temp.id, this.temp).then(res => {
             for (const v of this.list) {
               if (v.id === this.temp.id) {
                 const index = this.list.indexOf(v)
@@ -256,7 +252,7 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        fetchDel({ id: row.id }).then(response => {
+        fetchDel(row.id).then(response => {
           const index = this.list.indexOf(row)
           this.list.splice(index, 1)
           this.$message({

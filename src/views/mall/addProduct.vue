@@ -300,7 +300,7 @@
 </template>
 
 <script>
-import { detailGoods, editGoods, listCatAndBrand, publishGoods } from '@/api/mall'
+import { detailGoods, editGoods, publishGoods } from '@/api/mall'
 import Tinymce from '@/components/Tinymce'
 import oss from '@/utils/aliOss'
 import { promptMessage } from '@/utils/index'
@@ -358,7 +358,7 @@ export default {
   },
   created() {
     this.init()
-    this.getlistCatAndBrand()
+    // this.getlistCatAndBrand()
   },
   methods: {
     init() {
@@ -401,12 +401,12 @@ export default {
         }
       })
     },
-    getlistCatAndBrand() {
-      listCatAndBrand().then(response => {
-        this.categoryList = response.data.data.categoryList
-        this.brandList = response.data.data.brandList
-      })
-    },
+    // getlistCatAndBrand() {
+    //   listCatAndBrand().then(response => {
+    //     this.categoryList = response.data.data.categoryList
+    //     this.brandList = response.data.data.brandList
+    //   })
+    // },
     handleCategoryChange(value) {
       this.goods.categoryId = value[value.length - 1]
     },

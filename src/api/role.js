@@ -11,7 +11,7 @@ export function listRole(query) {
 // 创建角色
 export function createRole(data) {
   return request({
-    url: '/admin/role/create',
+    url: '/role/create',
     method: 'post',
     data
   })
@@ -27,7 +27,7 @@ export function readRole(data) {
 // 编辑角色
 export function updateRole(data) {
   return request({
-    url: '/admin/role/update',
+    url: '/role/update',
     method: 'post',
     data
   })
@@ -35,7 +35,7 @@ export function updateRole(data) {
 // 删除角色
 export function deleteRole(data) {
   return request({
-    url: '/admin/role/delete',
+    url: '/role/delete',
     method: 'post',
     data
   })

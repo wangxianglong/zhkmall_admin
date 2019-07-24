@@ -98,46 +98,46 @@ export const asyncRouterMap = [
           title: '会员管理',
           noCache: true
         }
-      },
-      {
-        path: 'realName',
-        component: () => import('@/views/user/realName'),
-        name: 'realName',
-        meta: {
-          perms: ['GET /admin/realname/list', 'POST /admin/realname/audit'],
-          title: '实名认证',
-          noCache: true
-        }
-      },
-      {
-        path: 'userRecommend',
-        component: () => import('@/views/user/userRecommend'),
-        name: 'userRecommend',
-        meta: {
-          perms: ['GET /admin/userrecommend/list'],
-          title: '推荐会员',
-          noCache: true
-        }
-      },
-      {
-        path: 'address',
-        component: () => import('@/views/user/address'),
-        name: 'address',
-        meta: {
-          perms: ['GET /admin/address/list'],
-          title: '收货地址',
-          noCache: true
-        }
-      },
-      {
-        path: 'mealCoupon',
-        component: () => import('@/views/user/mealCoupon'),
-        name: 'mealCoupon',
-        meta: {
-          perms: ['GET /admin/buffetcouponuser/list', 'GET /admin/buffetcouponuser/read'],
-          title: '用户餐券',
-          noCache: true
-        }
+      // },
+      // {
+      //   path: 'realName',
+      //   component: () => import('@/views/user/realName'),
+      //   name: 'realName',
+      //   meta: {
+      //     perms: ['GET /admin/realname/list', 'POST /admin/realname/audit'],
+      //     title: '实名认证',
+      //     noCache: true
+      //   }
+      // },
+      // {
+      //   path: 'userRecommend',
+      //   component: () => import('@/views/user/userRecommend'),
+      //   name: 'userRecommend',
+      //   meta: {
+      //     perms: ['GET /admin/userrecommend/list'],
+      //     title: '推荐会员',
+      //     noCache: true
+      //   }
+      // },
+      // {
+      //   path: 'address',
+      //   component: () => import('@/views/user/address'),
+      //   name: 'address',
+      //   meta: {
+      //     perms: ['GET /admin/address/list'],
+      //     title: '收货地址',
+      //     noCache: true
+      //   }
+      // },
+      // {
+      //   path: 'mealCoupon',
+      //   component: () => import('@/views/user/mealCoupon'),
+      //   name: 'mealCoupon',
+      //   meta: {
+      //     perms: ['GET /admin/buffetcouponuser/list', 'GET /admin/buffetcouponuser/read'],
+      //     title: '用户餐券',
+      //     noCache: true
+      //   }
       }
     ]
   },
@@ -149,27 +149,17 @@ export const asyncRouterMap = [
     alwaysShow: true,
     name: 'mallManage',
     meta: {
-      title: '商城管理',
+      title: '产品管理',
       icon: 'chart'
     },
     children: [
       {
-        path: 'category',
-        component: () => import('@/views/mall/category'),
-        name: 'category',
-        meta: {
-          perms: ['GET /admin/category/list', 'POST /admin/category/create', 'GET /admin/category/read', 'POST /admin/category/update', 'POST /admin/category/delete'],
-          title: '商品类目',
-          noCache: true
-        }
-      },
-      {
-        path: 'commodity',
-        component: () => import('@/views/mall/commodity'),
-        name: 'commodity',
+        path: 'productList',
+        component: () => import('@/views/mall/productList'),
+        name: 'productList',
         meta: {
           perms: ['GET /admin/goods/list', 'POST /admin/goods/create', 'GET /admin/goods/read', 'POST /admin/goods/update', 'POST /admin/goods/delete', 'POST /admin/goods/standUpAndDown'],
-          title: '商品管理',
+          title: '商品列表',
           noCache: true
         }
       },
@@ -183,53 +173,83 @@ export const asyncRouterMap = [
           noCache: true
         },
         hidden: true
-      }
-    ]
-  },
-
-  {
-    path: '/restaurant',
-    component: Layout,
-    redirect: 'noredirect',
-    alwaysShow: true,
-    name: 'restaurant',
-    meta: {
-      title: '餐厅管理',
-      icon: 'icon'
-    },
-    children: [
+      },
       {
-        path: 'foodCategory',
-        component: () => import('@/views/restaurant/foodCategory'),
-        name: 'foodCategory',
+        path: 'category',
+        component: () => import('@/views/mall/category'),
+        name: 'category',
         meta: {
-          perms: ['GET /admin/suppercategory/list', 'POST /admin/suppercategory/create', 'GET /admin/suppercategory/read', 'POST /admin/suppercategory/update', 'POST /admin/suppercategory/delete'],
-          title: '菜品类目',
+          perms: ['GET /admin/category/list', 'POST /admin/category/create', 'GET /admin/category/read', 'POST /admin/category/update', 'POST /admin/category/delete'],
+          title: '商品分类',
           noCache: true
         }
       },
       {
-        path: 'foodManage',
-        component: () => import('@/views/restaurant/foodManage'),
-        name: 'foodManage',
+        path: 'productTypes',
+        component: () => import('@/views/mall/productTypes'),
+        name: 'productTypes',
         meta: {
-          perms: ['GET /admin/supper/list', 'POST /admin/supper/create', 'GET /admin/supper/read', 'POST /admin/supper/update', 'POST /admin/supper/delete', 'POST /admin/supper/standUpAndDown'],
-          title: '菜品管理',
+          perms: ['GET /admin/category/list', 'POST /admin/category/create', 'GET /admin/category/read', 'POST /admin/category/update', 'POST /admin/category/delete'],
+          title: '商品类型',
           noCache: true
         }
       },
       {
-        path: 'buffetCoupon',
-        component: () => import('@/views/restaurant/buffetCoupon'),
-        name: 'buffetCoupon',
+        path: 'brandManage',
+        component: () => import('@/views/mall/brandManage'),
+        name: 'brandManage',
         meta: {
-          perms: ['GET /admin/buffetcoupon/list', 'POST /admin/buffetcoupon/create', 'GET /admin/buffetcoupon/read', 'POST /admin/buffetcoupon/update', 'POST /admin/buffetcoupon/delete', 'POST /admin/buffetcoupon/standUpAndDown'],
-          title: '自助餐券管理',
+          perms: ['GET /admin/category/list', 'POST /admin/category/create', 'GET /admin/category/read', 'POST /admin/category/update', 'POST /admin/category/delete'],
+          title: '品牌管理',
           noCache: true
         }
       }
     ]
   },
+
+  // {
+  //   path: '/restaurant',
+  //   component: Layout,
+  //   redirect: 'noredirect',
+  //   alwaysShow: true,
+  //   name: 'restaurant',
+  //   meta: {
+  //     title: '餐厅管理',
+  //     icon: 'icon'
+  //   },
+  //   children: [
+  //     {
+  //       path: 'foodCategory',
+  //       component: () => import('@/views/restaurant/foodCategory'),
+  //       name: 'foodCategory',
+  //       meta: {
+  //         perms: ['GET /admin/suppercategory/list', 'POST /admin/suppercategory/create', 'GET /admin/suppercategory/read', 'POST /admin/suppercategory/update', 'POST /admin/suppercategory/delete'],
+  //         title: '菜品类目',
+  //         noCache: true
+  //       }
+  //     },
+  //     {
+  //       path: 'foodManage',
+  //       component: () => import('@/views/restaurant/foodManage'),
+  //       name: 'foodManage',
+  //       meta: {
+  //         perms: ['GET /admin/supper/list', 'POST /admin/supper/create', 'GET /admin/supper/read', 'POST /admin/supper/update', 'POST /admin/supper/delete', 'POST /admin/supper/standUpAndDown'],
+  //         title: '菜品管理',
+  //         noCache: true
+  //       }
+  //     },
+  //     {
+  //       path: 'buffetCoupon',
+  //       component: () => import('@/views/restaurant/buffetCoupon'),
+  //       name: 'buffetCoupon',
+  //       meta: {
+  //         perms: ['GET /admin/buffetcoupon/list', 'POST /admin/buffetcoupon/create', 'GET /admin/buffetcoupon/read', 'POST /admin/buffetcoupon/update', 'POST /admin/buffetcoupon/delete', 'POST /admin/buffetcoupon/standUpAndDown'],
+  //         title: '自助餐券管理',
+  //         noCache: true
+  //       }
+  //     }
+  //   ]
+  // },
 
   {
     path: '/business',
@@ -248,86 +268,86 @@ export const asyncRouterMap = [
         name: 'mallOrder',
         meta: {
           perms: ['GET /admin/order/list', 'GET /admin/order/read', 'POST /admin/order/designate', 'POST /admin/order/status'],
-          title: '商城订单',
+          title: '订单列表',
           noCache: true
         }
-      },
-      {
-        path: 'ticketOrder',
-        component: () => import('@/views/business/ticketOrder'),
-        name: 'ticketOrder',
-        meta: {
-          perms: ['GET /admin/takeoutorder/list', 'GET /admin/takeoutorder/read', 'POST /admin/takeoutorder/designate', 'POST /admin/takeoutorder/status'],
-          title: '外卖订单',
-          noCache: true
-        }
-      },
-      {
-        path: 'deliveryOrder',
-        component: () => import('@/views/business/deliveryOrder'),
-        name: 'deliveryOrder',
-        meta: {
-          perms: ['GET /admin/buffetcouponorder/list', 'GET /admin/buffetcouponorder/read', 'POST /admin/buffetcouponorder/status'],
-          title: '券订单',
-          noCache: true
-        }
-      },
-      {
-        path: 'flowStatistics',
-        component: () => import('@/views/business/flowStatistics'),
-        name: 'flowStatistics',
-        meta: {
-          perms: ['GET /admin/serial/list', 'GET /admin/serial/read', 'GET /admin/serial/remark'],
-          title: '流水统计',
-          noCache: true
-        }
+      // },
+      // {
+      //   path: 'ticketOrder',
+      //   component: () => import('@/views/business/ticketOrder'),
+      //   name: 'ticketOrder',
+      //   meta: {
+      //     perms: ['GET /admin/takeoutorder/list', 'GET /admin/takeoutorder/read', 'POST /admin/takeoutorder/designate', 'POST /admin/takeoutorder/status'],
+      //     title: '外卖订单',
+      //     noCache: true
+      //   }
+      // },
+      // {
+      //   path: 'deliveryOrder',
+      //   component: () => import('@/views/business/deliveryOrder'),
+      //   name: 'deliveryOrder',
+      //   meta: {
+      //     perms: ['GET /admin/buffetcouponorder/list', 'GET /admin/buffetcouponorder/read', 'POST /admin/buffetcouponorder/status'],
+      //     title: '券订单',
+      //     noCache: true
+      //   }
+      // },
+      // {
+      //   path: 'flowStatistics',
+      //   component: () => import('@/views/business/flowStatistics'),
+      //   name: 'flowStatistics',
+      //   meta: {
+      //     perms: ['GET /admin/serial/list', 'GET /admin/serial/read', 'GET /admin/serial/remark'],
+      //     title: '流水统计',
+      //     noCache: true
+      //   }
       }
     ]
   },
 
-  {
-    path: '/myBusiness',
-    component: Layout,
-    redirect: 'noredirect',
-    alwaysShow: true,
-    name: 'myBusinessManage',
-    meta: {
-      title: '我的业务管理',
-      icon: 'form'
-    },
-    children: [
-      {
-        path: 'myMallOrder',
-        component: () => import('@/views/myBusiness/mallOrder'),
-        name: 'myMallOrder',
-        meta: {
-          perms: ['GET /admin/myorder/list', 'GET /admin/myorder/read', 'POST /admin/myorder/ship', 'POST /admin/myorder/delivery'],
-          title: '商城订单',
-          noCache: true
-        }
-      },
-      {
-        path: 'myTicketOrder',
-        component: () => import('@/views/myBusiness/ticketOrder'),
-        name: 'myTicketOrder',
-        meta: {
-          perms: ['GET /admin/mytakeoutorder/list', 'GET /admin/mytakeoutorder/read', 'POST /admin/mytakeoutorder/ship', 'POST /admin/mytakeoutorder/delivery'],
-          title: '外卖订单',
-          noCache: true
-        }
-      },
-      {
-        path: 'myDeliveryOrder',
-        component: () => import('@/views/myBusiness/deliveryOrder'),
-        name: 'myDeliveryOrder',
-        meta: {
-          perms: ['GET /admin/mybuffetcouponorder/list', 'GET /admin/mybuffetcouponorder/read'],
-          title: '券订单',
-          noCache: true
-        }
-      }
-    ]
-  },
+  // {
+  //   path: '/myBusiness',
+  //   component: Layout,
+  //   redirect: 'noredirect',
+  //   alwaysShow: true,
+  //   name: 'myBusinessManage',
+  //   meta: {
+  //     title: '我的业务管理',
+  //     icon: 'form'
+  //   },
+  //   children: [
+  //     {
+  //       path: 'myMallOrder',
+  //       component: () => import('@/views/myBusiness/mallOrder'),
+  //       name: 'myMallOrder',
+  //       meta: {
+  //         perms: ['GET /admin/myorder/list', 'GET /admin/myorder/read', 'POST /admin/myorder/ship', 'POST /admin/myorder/delivery'],
+  //         title: '商城订单',
+  //         noCache: true
+  //       }
+  //     },
+  //     {
+  //       path: 'myTicketOrder',
+  //       component: () => import('@/views/myBusiness/ticketOrder'),
+  //       name: 'myTicketOrder',
+  //       meta: {
+  //         perms: ['GET /admin/mytakeoutorder/list', 'GET /admin/mytakeoutorder/read', 'POST /admin/mytakeoutorder/ship', 'POST /admin/mytakeoutorder/delivery'],
+  //         title: '外卖订单',
+  //         noCache: true
+  //       }
+  //     },
+  //     {
+  //       path: 'myDeliveryOrder',
+  //       component: () => import('@/views/myBusiness/deliveryOrder'),
+  //       name: 'myDeliveryOrder',
+  //       meta: {
+  //         perms: ['GET /admin/mybuffetcouponorder/list', 'GET /admin/mybuffetcouponorder/read'],
+  //         title: '券订单',
+  //         noCache: true
+  //       }
+  //     }
+  //   ]
+  // },
 
   {
     path: '/platform',
@@ -336,57 +356,57 @@ export const asyncRouterMap = [
     alwaysShow: true,
     name: 'platformManage',
     meta: {
-      title: '平台管理',
+      title: '设置',
       icon: 'nested'
     },
     children: [
       {
-        path: 'storeManage',
-        component: () => import('@/views/platform/storeManage'),
-        name: 'storeManage',
+        path: 'basicSet',
+        component: () => import('@/views/platform/basicSet'),
+        name: 'basicSet',
         meta: {
           perms: ['GET /admin/store/list', 'POST /admin/store/create', 'GET /admin/store/read', 'POST /admin/store/update', 'POST /admin/store/delete'],
-          title: '门店管理',
+          title: '基础配置',
           noCache: true
         }
       },
       {
-        path: 'shippingSet',
-        component: () => import('@/views/platform/shippingSet'),
-        name: 'shippingSet',
+        path: 'languageSet',
+        component: () => import('@/views/platform/languageSet'),
+        name: 'languageSet',
         meta: {
           perms: ['GET /admin/distribution/read', 'POST /admin/distribution/create'],
-          title: '配送设置',
+          title: '语言配置',
           noCache: true
         }
       },
       {
-        path: 'couponRule',
-        component: () => import('@/views/platform/couponRule'),
-        name: 'couponRule',
+        path: 'currencySet',
+        component: () => import('@/views/platform/currencySet'),
+        name: 'currencySet',
         meta: {
           perms: ['GET /admin/buffetcoupon/rule/read', 'POST /admin/buffetcoupon/rule/create'],
-          title: '餐券规则',
+          title: '货币配置',
           noCache: true
         }
       },
       {
-        path: 'slideshow',
-        component: () => import('@/views/platform/slideshow'),
-        name: 'slideshow',
+        path: 'freightSet',
+        component: () => import('@/views/platform/freightSet'),
+        name: 'freightSet',
         meta: {
           perms: ['GET /admin/ad/list', 'POST /admin/ad/create', 'GET /admin/ad/read', 'POST /admin/ad/update', 'POST /admin/ad/delete'],
-          title: '轮播图',
+          title: '运费配置',
           noCache: true
         }
       },
       {
-        path: 'setLink',
-        component: () => import('@/views/platform/setLink'),
-        name: 'setLink',
+        path: 'paymentSet',
+        component: () => import('@/views/platform/paymentSet'),
+        name: 'paymentSet',
         meta: {
           perms: ['POST /admin/link/create', 'GET /admin/link/read'],
-          title: '链接设置',
+          title: '支付配置',
           noCache: true
         }
       }
