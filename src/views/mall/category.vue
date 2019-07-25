@@ -2,7 +2,7 @@
   <div class="app-container">
     <!-- 查询和其他操作 -->
     <div class="filter-container">
-      <el-input
+      <!-- <el-input
         v-model="listQuery.id"
         clearable
         class="filter-item"
@@ -22,7 +22,7 @@
         type="primary"
         icon="el-icon-search"
         @click="handleFilter"
-      >查找</el-button>
+      >查找</el-button>-->
       <el-button
         v-permission="['POST /admin/category/create']"
         class="filter-item"
@@ -43,36 +43,34 @@
       fit
       highlight-current-row
     >
-      <el-table-column align="center" label="ID" prop="id"/>
-      <el-table-column align="center" label="类目名称" prop="name"/>
-      <el-table-column align="center" property="iconUrl" label="类目图标">
+      <el-table-column align="center" label="ID" prop="id" />
+      <el-table-column align="center" label="分类名称" prop="name" />
+      <el-table-column align="center" property="iconUrl" label="分类图标">
         <template slot-scope="scope">
-          <img
-            v-if="scope.row.iconUrl"
-            :src="scope.row.iconUrl"
-            style="width: 50px;border-radius: 3px;"
-          >
+          <img :src="scope.row.icon" :alt="scope.row.name" style="width: 50px;border-radius: 3px;">
         </template>
       </el-table-column>
-      <el-table-column align="center" property="picUrl" label="类目图片">
-        <template slot-scope="scope">
-          <img
-            v-if="scope.row.picUrl"
-            :src="scope.row.picUrl"
-            style="width: 80px;border-radius: 3px;"
-          >
-        </template>
-      </el-table-column>
-      <el-table-column align="center" label="关键字" prop="keywords"/>
-      <el-table-column align="center" min-width="150" label="广告语介绍" prop="desc"/>
+      <el-table-column align="center" label="关键字" prop="keywords" />
+      <el-table-column align="center" min-width="150" label="描述" prop="description" />
       <el-table-column align="center" label="级别" prop="level">
         <template slot-scope="scope">
           <el-tag
-            :type="scope.row.level === 'L1' ? 'primary' : 'info' "
-          >{{ scope.row.level === 'L1' ? '一级类目' : '二级类目' }}</el-tag>
+            :type="scope.row.level === 0 ? 'primary' : 'info' "
+          >{{ scope.row.level === 0 ? '一级' : '二级' }}</el-tag>
         </template>
       </el-table-column>
-      <el-table-column align="center" label="父类目ID" prop="pid"/>
+      <el-table-column align="center" label="商品数" prop="productCount" />
+      <el-table-column align="center" label="商品单位" prop="productUnit" />
+      <el-table-column align="center" label="导航栏显示">
+        <template slot-scope="scope">
+          <el-switch v-model="scope.row.navStatus" active-color="#13ce66" />
+        </template>
+      </el-table-column>
+      <el-table-column align="center" label="显示状态">
+        <template slot-scope="scope">
+          <el-switch v-model="scope.row.showStatus" active-color="#13ce66" />
+        </template>
+      </el-table-column>
       <el-table-column align="center" label="操作" width="200" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button
@@ -110,19 +108,42 @@
         label-width="100px"
         style="margin:0 50px;"
       >
-        <el-form-item label="类目名称" prop="name">
-          <el-input v-model="dataForm.name" placeholder="请输入类目名称"/>
+        <el-form-item label="分类名称" prop="name">
+          <el-input v-model="dataForm.name" placeholder="请输入分类名称" />
         </el-form-item>
         <el-form-item label="关键字" prop="keywords">
-          <el-input v-model="dataForm.keywords" placeholder="请输入关键字"/>
+          <el-input v-model="dataForm.keywords" placeholder="请输入关键字" />
         </el-form-item>
         <el-form-item label="级别" prop="level">
           <el-select v-model="dataForm.level" @change="onLevelChange">
-            <el-option label="一级类目" value="L1"/>
-            <el-option label="二级类目" value="L2"/>
+            <el-option label="一级分类" value="0" />
+            <el-option label="二级分类" value="1" />
           </el-select>
         </el-form-item>
-        <el-form-item v-if="dataForm.level === 'L2'" label="父类目" prop="pid">
+        <el-form-item label="导航栏显示：" prop="navStatus">
+          <el-select v-model="dataForm.navStatus" class="filter-item" placeholder="请选择">
+            <el-option
+              v-for="(item, index) in navStatus"
+              :key="index"
+              :label="item"
+              :value="index"
+            />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="显示状态：" prop="navStatus">
+          <el-select v-model="dataForm.showStatus" class="filter-item" placeholder="请选择">
+            <el-option
+              v-for="(item, index) in navStatus"
+              :key="index"
+              :label="item"
+              :value="index"
+            />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="商品单位" prop="productUnit">
+          <el-input v-model="dataForm.productUnit" placeholder="请输入商品单位" />
+        </el-form-item>
+        <el-form-item v-if="dataForm.level === 1" label="父类目" prop="pid">
           <el-select v-model="dataForm.pid">
             <el-option
               v-for="item in catL1"
@@ -132,7 +153,7 @@
             />
           </el-select>
         </el-form-item>
-        <el-form-item label="类目图标" prop="iconUrl">
+        <el-form-item label="分类图标" prop="iconUrl">
           <el-upload
             :http-request="fnUploadRequest"
             :show-file-list="true"
@@ -144,26 +165,11 @@
             list-type="picture-card"
             action
           >
-            <i class="el-icon-plus"/>
+            <i class="el-icon-plus" />
           </el-upload>
         </el-form-item>
-        <el-form-item label="类目图片">
-          <el-upload
-            :http-request="fnUploadpicUrl"
-            :show-file-list="true"
-            :file-list="picUrl"
-            :on-remove="handleRemovePic"
-            :on-exceed="beyondFile"
-            :limit="1"
-            :before-upload="beforeAvatarUpload"
-            list-type="picture-card"
-            action
-          >
-            <i class="el-icon-plus"/>
-          </el-upload>
-        </el-form-item>
-        <el-form-item label="类目简介" prop="desc">
-          <el-input v-model="dataForm.desc" placeholder="请输入类目简介"/>
+        <el-form-item label="描述" prop="description">
+          <el-input v-model="dataForm.description" :rows="2" type="textarea" placeholder="请输入描述" />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -196,7 +202,7 @@ export default {
         name: undefined
       },
       iconUrl: [],
-      picUrl: [],
+      navStatus: ['不显示', '显示'],
       catL1: {},
       dataForm: {
         id: undefined,
@@ -205,8 +211,7 @@ export default {
         level: 'L2',
         pid: undefined,
         desc: '',
-        iconUrl: undefined,
-        picUrl: undefined
+        iconUrl: undefined
       },
       dialogFormVisible: false,
       dialogStatus: '',
@@ -230,8 +235,8 @@ export default {
       listCategory(this.listQuery).then(response => {
         this.list = response.data.data.items
         this.total = response.data.data.total
-        this.listLoading = false
       })
+      this.listLoading = false
     },
     getCatL1() {
       listCatL1().then(response => {
@@ -247,11 +252,6 @@ export default {
         this.iconUrl = [{ url: res.fileUrl }]
       })
     },
-    async fnUploadpicUrl(option) {
-      oss.ossUploadFile(option).then(res => {
-        this.picUrl = [{ url: res.fileUrl }]
-      })
-    },
     beforeAvatarUpload(file) {
       let isIMAGE = false
       if (file.type === 'image/jpeg' || file.type === 'image/gif' || file.type === 'image/png') {
@@ -265,9 +265,6 @@ export default {
     // 删除图片
     handleRemove(file, fileList) {
       this.iconUrl = []
-    },
-    handleRemovePic(file, fileList) {
-      this.picUrl = []
     },
     // 添加多个文件事件
     beyondFile(files, fileList) {
@@ -286,7 +283,6 @@ export default {
         desc: ''
       }
       this.iconUrl = []
-      this.picUrl = []
     },
     onLevelChange(value) {
       if (value === 'L1') {
@@ -308,9 +304,6 @@ export default {
         if (valid) {
           if (this.iconUrl.length > 0) {
             this.dataForm.iconUrl = this.iconUrl[0].url
-          }
-          if (this.picUrl.length > 0) {
-            this.dataForm.picUrl = this.picUrl[0].url
           }
           if (this.dataForm.level === 'L2') {
             if (this.dataForm.pid === 0 || this.dataForm.pid === undefined) {
@@ -344,13 +337,6 @@ export default {
       } else {
         this.iconUrl = []
       }
-      if (this.dataForm.picUrl) {
-        this.picUrl = [{
-          url: this.dataForm.picUrl
-        }]
-      } else {
-        this.picUrl = []
-      }
       this.dialogStatus = 'update'
       this.dialogFormVisible = true
       this.$nextTick(() => {
@@ -365,11 +351,6 @@ export default {
             this.dataForm.iconUrl = this.iconUrl[0].url
           } else {
             this.dataForm.iconUrl = ''
-          }
-          if (this.picUrl.length > 0) {
-            this.dataForm.picUrl = this.picUrl[0].url
-          } else {
-            this.dataForm.picUrl = ''
           }
           if (this.dataForm.level === 'L2') {
             if (this.dataForm.pid === 0) {
@@ -437,7 +418,6 @@ export default {
           'level',
           'pid',
           'iconUrl',
-          'picUrl',
           'desc'
         ]
         excel.export_json_to_excel2(

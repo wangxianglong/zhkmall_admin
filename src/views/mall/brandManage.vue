@@ -3,18 +3,11 @@
     <!-- 查询和其他操作 -->
     <div class="filter-container">
       <el-input
-        v-model="listQuery.id"
+        v-model="listQuery.keyword"
         clearable
         class="filter-item"
         style="width: 200px;"
-        placeholder="请输入类目ID"
-      />
-      <el-input
-        v-model="listQuery.name"
-        clearable
-        class="filter-item"
-        style="width: 200px;"
-        placeholder="请输入类目名称"
+        placeholder="请输入关键字"
       />
       <el-button
         v-permission="['GET /admin/category/list']"
@@ -30,7 +23,6 @@
         icon="el-icon-edit"
         @click="handleCreate"
       >添加</el-button>
-      <!-- <el-button :loading="downloadLoading" class="filter-item" type="primary" icon="el-icon-download" @click="handleDownload">导出</el-button> -->
     </div>
 
     <!-- 查询结果 -->
@@ -43,36 +35,28 @@
       fit
       highlight-current-row
     >
-      <el-table-column align="center" label="ID" prop="id"/>
-      <el-table-column align="center" label="类目名称" prop="name"/>
-      <el-table-column align="center" property="iconUrl" label="类目图标">
+      <el-table-column align="center" label="ID" prop="id" />
+      <el-table-column align="center" label="名称" prop="name" />
+      <el-table-column align="center" property="logo" label="Logo">
         <template slot-scope="scope">
-          <img
-            v-if="scope.row.iconUrl"
-            :src="scope.row.iconUrl"
-            style="width: 50px;border-radius: 3px;"
-          >
+          <img :alt="scope.row.name" :src="scope.row.logo" style="width: 50px;border-radius: 3px;" >
         </template>
       </el-table-column>
-      <el-table-column align="center" property="picUrl" label="类目图片">
+      <el-table-column align="center" label="首字母" prop="firstLetter" />
+      <el-table-column align="center" label="类别" prop="sort" />
+      <el-table-column align="center" min-width="150" label="品牌故事 " prop="brandStory" />
+      <el-table-column align="center" label="商品数" prop="productCount" />
+      <el-table-column align="center" label="产品评论数" prop="productCommentCount" />
+      <el-table-column align="center" label="制造商">
         <template slot-scope="scope">
-          <img
-            v-if="scope.row.picUrl"
-            :src="scope.row.picUrl"
-            style="width: 80px;border-radius: 3px;"
-          >
+          <el-switch v-model="scope.row.factoryStatus" active-color="#13ce66" />
         </template>
       </el-table-column>
-      <el-table-column align="center" label="关键字" prop="keywords"/>
-      <el-table-column align="center" min-width="150" label="广告语介绍" prop="desc"/>
-      <el-table-column align="center" label="级别" prop="level">
+      <el-table-column align="center" label="显示状态">
         <template slot-scope="scope">
-          <el-tag
-            :type="scope.row.level === 'L1' ? 'primary' : 'info' "
-          >{{ scope.row.level === 'L1' ? '一级类目' : '二级类目' }}</el-tag>
+          <el-switch v-model="scope.row.showStatus" active-color="#13ce66" />
         </template>
       </el-table-column>
-      <el-table-column align="center" label="父类目ID" prop="pid"/>
       <el-table-column align="center" label="操作" width="200" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button
@@ -110,29 +94,43 @@
         label-width="100px"
         style="margin:0 50px;"
       >
-        <el-form-item label="类目名称" prop="name">
-          <el-input v-model="dataForm.name" placeholder="请输入类目名称"/>
+        <el-form-item label="名称" prop="name">
+          <el-input v-model="dataForm.name" placeholder="请输入品牌名称" />
         </el-form-item>
-        <el-form-item label="关键字" prop="keywords">
-          <el-input v-model="dataForm.keywords" placeholder="请输入关键字"/>
+        <el-form-item label="首字母" prop="firstLetter">
+          <el-input v-model="dataForm.firstLetter" placeholder="请输入首字母" />
         </el-form-item>
-        <el-form-item label="级别" prop="level">
-          <el-select v-model="dataForm.level" @change="onLevelChange">
-            <el-option label="一级类目" value="L1"/>
-            <el-option label="二级类目" value="L2"/>
-          </el-select>
-        </el-form-item>
-        <el-form-item v-if="dataForm.level === 'L2'" label="父类目" prop="pid">
-          <el-select v-model="dataForm.pid">
+        <el-form-item label="制造商：" prop="factoryStatus">
+          <el-select v-model="dataForm.factoryStatus" class="filter-item" placeholder="请选择">
             <el-option
-              v-for="item in catL1"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value"
+              v-for="(item, index) in factoryStatus"
+              :key="index"
+              :label="item"
+              :value="index"
             />
           </el-select>
         </el-form-item>
-        <el-form-item label="类目图标" prop="iconUrl">
+        <el-form-item label="类别：" prop="sort">
+          <el-select v-model="dataForm.sort" class="filter-item" placeholder="请选择">
+            <el-option
+              v-for="(item, index) in navStatus"
+              :key="index"
+              :label="item"
+              :value="index"
+            />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="显示状态：" prop="navStatus">
+          <el-select v-model="dataForm.showStatus" class="filter-item" placeholder="请选择">
+            <el-option
+              v-for="(item, index) in navStatus"
+              :key="index"
+              :label="item"
+              :value="index"
+            />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="Logo" prop="logo">
           <el-upload
             :http-request="fnUploadRequest"
             :show-file-list="true"
@@ -144,10 +142,10 @@
             list-type="picture-card"
             action
           >
-            <i class="el-icon-plus"/>
+            <i class="el-icon-plus" />
           </el-upload>
         </el-form-item>
-        <el-form-item label="类目图片">
+        <el-form-item label="专区大图">
           <el-upload
             :http-request="fnUploadpicUrl"
             :show-file-list="true"
@@ -159,11 +157,11 @@
             list-type="picture-card"
             action
           >
-            <i class="el-icon-plus"/>
+            <i class="el-icon-plus" />
           </el-upload>
         </el-form-item>
-        <el-form-item label="类目简介" prop="desc">
-          <el-input v-model="dataForm.desc" placeholder="请输入类目简介"/>
+        <el-form-item label="品牌故事" prop="brandStory">
+          <el-input v-model="dataForm.brandStory" :rows="2" type="textarea" placeholder="请输入品牌故事" />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -198,6 +196,8 @@ export default {
       iconUrl: [],
       picUrl: [],
       catL1: {},
+      navStatus: ['不显示', '显示'],
+      factoryStatus: ['不是', '是'],
       dataForm: {
         id: undefined,
         name: '',
