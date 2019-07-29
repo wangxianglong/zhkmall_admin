@@ -9,30 +9,92 @@
         label-width="150px"
         style="margin-right: 40px;"
       >
-        <el-form-item label="商品编号" prop="goodsSn">
-          <el-input v-model="goods.goodsSn" placeholder="请输入商品编号"/>
+        <el-form-item label="品牌编号" prop="brandId">
+          <el-input v-model="goods.brandId" placeholder="请输入品牌编号" />
         </el-form-item>
-        <el-form-item label="商品名称" prop="name">
-          <el-input v-model="goods.name" placeholder="请输入商品名称"/>
+        <el-form-item label="品牌名称" prop="brandName">
+          <el-input v-model="goods.brandName" placeholder="请输入品牌名称" />
         </el-form-item>
-        <el-form-item label="专柜价格">
+        <!-- <el-form-item label="专柜价格">
           <el-input v-model="goods.counterPrice" placeholder="请输入专柜价格">
             <template slot="append">元</template>
           </el-input>
-        </el-form-item>
-        <el-form-item label="当前价格" prop="retailPrice">
-          <el-input v-model="goods.retailPrice" placeholder="请输入当前价格">
+        </el-form-item>-->
+        <el-form-item label="市场价" prop="originalPrice">
+          <el-input v-model="goods.originalPrice" placeholder="请输入市场价">
             <template slot="append">元</template>
           </el-input>
         </el-form-item>
-        <el-form-item label="是否在售">
+        <!-- <el-form-item label="是否在售">
           <el-radio-group v-model="goods.isOnSale">
             <el-radio :label="true">在售</el-radio>
             <el-radio :label="false">未售</el-radio>
           </el-radio-group>
+        </el-form-item>-->
+        <el-form-item label="删除状态">
+          <el-select v-model="goods.deleteStatus" placeholder="请选择">
+            <el-option
+              v-for="(item, index) in delStatusMap"
+              :key="index"
+              :label="item"
+              :value="index"
+            />
+          </el-select>
         </el-form-item>
-
-        <el-form-item label="商品图片">
+        <el-form-item label="新品状态">
+          <el-select v-model="goods.newStatus" placeholder="请选择">
+            <el-option
+              v-for="(item, index) in newStatusMap"
+              :key="index"
+              :label="item"
+              :value="index"
+            />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="上架状态">
+          <el-select v-model="goods.publishStatus" placeholder="请选择">
+            <el-option
+              v-for="(item, index) in publishStatusMap"
+              :key="index"
+              :label="item"
+              :value="index"
+            />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="促销类型">
+          <el-select v-model="goods.promotionType" placeholder="请选择">
+            <el-option
+              v-for="(item, index) in promotionTypeMap"
+              :key="index"
+              :label="item"
+              :value="index"
+            />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="推荐状态">
+          <el-select v-model="goods.recommandStatus" placeholder="请选择">
+            <el-option
+              v-for="(item, index) in recommandStatusMap"
+              :key="index"
+              :label="item"
+              :value="index"
+            />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="审核状态">
+          <el-select v-model="goods.verifyStatus" placeholder="请选择">
+            <el-option
+              v-for="(item, index) in verifyStatusMap"
+              :key="index"
+              :label="item"
+              :value="index"
+            />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="是否为预告商品">
+          <el-switch v-model="goods.previewStatus" active-color="#13ce66" />
+        </el-form-item>
+        <!-- <el-form-item label="商品图片">
           <el-upload
             :http-request="fnUploadpicUrl"
             :show-file-list="true"
@@ -44,15 +106,15 @@
             list-type="picture-card"
             action
           >
-            <i class="el-icon-plus"/>
+            <i class="el-icon-plus" />
           </el-upload>
-        </el-form-item>
+        </el-form-item>-->
 
-        <el-form-item label="宣传图片">
+        <el-form-item label="画册图片">
           <el-upload
             :http-request="fnUploadRequest"
             :show-file-list="true"
-            :file-list="gallery"
+            :file-list="albumPics"
             :on-remove="handleRemove"
             :on-exceed="beyondFile"
             :limit="5"
@@ -60,12 +122,12 @@
             list-type="picture-card"
             action
           >
-            <i class="el-icon-plus"/>
+            <i class="el-icon-plus" />
           </el-upload>
         </el-form-item>
 
         <el-form-item label="商品单位">
-          <el-input v-model="goods.unit" placeholder="例: 件 / 个 / 盒"/>
+          <el-input v-model="goods.unit" placeholder="例: 件 / 个 / 盒" />
         </el-form-item>
 
         <el-form-item label="关键字">
@@ -104,12 +166,12 @@
           />
         </el-form-item>
 
-        <el-form-item label="商品简介">
-          <el-input v-model="goods.brief" placeholder="请输入商品简介"/>
+        <el-form-item label="商品描述">
+          <el-input v-model="goods.description" placeholder="请输入商品描述" />
         </el-form-item>
 
         <el-form-item label="商品详细介绍">
-          <Tinymce ref="editor" :height="400" v-model="goods.detail"/>
+          <Tinymce ref="editor" :height="400" v-model="goods.detail" />
         </el-form-item>
       </el-form>
     </el-card>
@@ -124,7 +186,7 @@
       >添加</el-button>
 
       <el-table :data="specifications" border fit highlight-current-row>
-        <el-table-column align="center" property="specification" label="规格名"/>
+        <el-table-column align="center" property="specification" label="规格名" />
         <el-table-column align="center" property="value" label="规格值">
           <template slot-scope="scope">
             <el-tag type="primary">{{ scope.row.value }}</el-tag>
@@ -132,7 +194,7 @@
         </el-table-column>
         <el-table-column align="center" property="picUrl" label="规格图片">
           <template slot-scope="scope">
-            <img v-if="scope.row.picUrl" :src="scope.row.picUrl" width="40">
+            <img v-if="scope.row.picUrl" :src="scope.row.picUrl" width="40" >
           </template>
         </el-table-column>
         <el-table-column
@@ -158,10 +220,10 @@
           style="margin:0 50px;"
         >
           <el-form-item label="规格名" prop="specification">
-            <el-input v-model="specForm.specification" placeholder="请输入规格名"/>
+            <el-input v-model="specForm.specification" placeholder="请输入规格名" />
           </el-form-item>
           <el-form-item label="规格值" prop="value">
-            <el-input v-model="specForm.value" placeholder="请输入规格值"/>
+            <el-input v-model="specForm.value" placeholder="请输入规格值" />
           </el-form-item>
           <el-form-item label="规格图片" prop="picUrl">
             <el-upload
@@ -175,7 +237,7 @@
               list-type="picture-card"
               action
             >
-              <i class="el-icon-plus"/>
+              <i class="el-icon-plus" />
             </el-upload>
           </el-form-item>
         </el-form>
@@ -194,11 +256,11 @@
             <el-tag v-for="tag in scope.row.specifications" :key="tag">{{ tag }}</el-tag>
           </template>
         </el-table-column>
-        <el-table-column align="center" property="price" label="货品售价"/>
-        <el-table-column align="center" property="number" label="货品数量"/>
+        <el-table-column align="center" property="price" label="货品售价" />
+        <el-table-column align="center" property="number" label="货品数量" />
         <el-table-column align="center" property="url" label="货品图片">
           <template slot-scope="scope">
-            <img v-if="scope.row.url" :src="scope.row.url" width="40">
+            <img v-if="scope.row.url" :src="scope.row.url" width="40" >
           </template>
         </el-table-column>
         <el-table-column align="center" label="操作" class-name="small-padding fixed-width">
@@ -222,10 +284,10 @@
             <el-tag v-for="tag in productForm.specifications" :key="tag">{{ tag }}</el-tag>
           </el-form-item>
           <el-form-item label="货品售价" prop="price">
-            <el-input-number v-model="productForm.price" :min="0"/>
+            <el-input-number v-model="productForm.price" :min="0" />
           </el-form-item>
           <el-form-item label="货品数量" prop="number">
-            <el-input-number v-model="productForm.number" :min="0"/>
+            <el-input-number v-model="productForm.number" :min="0" />
           </el-form-item>
           <el-form-item label="货品图片" prop="url">
             <el-upload
@@ -239,7 +301,7 @@
               list-type="picture-card"
               action
             >
-              <i class="el-icon-plus"/>
+              <i class="el-icon-plus" />
             </el-upload>
           </el-form-item>
         </el-form>
@@ -259,8 +321,8 @@
         @click="handleAttributeShow"
       >添加</el-button>
       <el-table :data="attributes" border fit highlight-current-row>
-        <el-table-column align="center" property="attribute" label="商品参数名称"/>
-        <el-table-column align="center" property="value" label="商品参数值"/>
+        <el-table-column align="center" property="attribute" label="商品参数名称" />
+        <el-table-column align="center" property="value" label="商品参数值" />
         <el-table-column align="center" label="操作" class-name="small-padding fixed-width">
           <template slot-scope="scope">
             <el-button type="danger" size="mini" @click="handleAttributeDelete(scope.row)">删除</el-button>
@@ -279,10 +341,10 @@
           style="width: 400px; margin-left:50px;"
         >
           <el-form-item label="商品参数名称" prop="attribute">
-            <el-input v-model="attributeForm.attribute" placeholder="请输入参数名称"/>
+            <el-input v-model="attributeForm.attribute" placeholder="请输入参数名称" />
           </el-form-item>
           <el-form-item label="商品参数值" prop="value">
-            <el-input v-model="attributeForm.value" placeholder="请输入参数值"/>
+            <el-input v-model="attributeForm.value" placeholder="请输入参数值" />
           </el-form-item>
         </el-form>
         <div slot="footer" class="dialog-footer">
@@ -313,15 +375,21 @@ export default {
       newKeywordVisible: false,
       newKeyword: '',
       keywords: [],
-      galleryFileList: [],
+      albumPicsFileList: [],
       categoryList: [],
       brandList: [],
       categoryIds: [],
-      gallery: [],
+      albumPics: [],
       picUrl: [],
       specImg: [],
       productImg: [],
-      goods: { gallery: [] },
+      delStatusMap: ['未删除', '已删除'],
+      newStatusMap: ['不是新品', '新品'],
+      recommandStatusMap: ['不推荐', '推荐'],
+      publishStatusMap: ['下架', '上架'],
+      promotionType: ['无促销', '促销价', '会员价', '阶梯价', '满减价', '限时购'],
+      verifyStatusMap: ['未审核', '审核通过'],
+      goods: { albumPics: [] },
       specVisiable: false,
       specForm: { specification: '', value: '', picUrl: '' },
       specifications: [],
@@ -338,16 +406,16 @@ export default {
       attributeForm: { attribute: '', value: '' },
       attributes: [],
       rules: {
-        goodsSn: [{ required: true, message: '商品编号不能为空', trigger: 'blur' }],
-        name: [{ required: true, message: '商品名称不能为空', trigger: 'blur' }],
-        retailPrice: [{ required: true, message: '请填写售价', trigger: 'blur' }]
+        brandId: [{ required: true, message: '商品编号不能为空', trigger: 'blur' }],
+        brandName: [{ required: true, message: '商品名称不能为空', trigger: 'blur' }],
+        originalPrice: [{ required: true, message: '请填写市场价', trigger: 'blur' }]
       },
       specRules: {
         specification: [{ required: true, message: '规格名不能为空', trigger: 'blur' }],
         value: [{ required: true, message: '规格值不能为空', trigger: 'blur' }]
       },
       productRules: {
-        price: [{ required: true, message: '请填写售价', trigger: 'blur' }],
+        price: [{ required: true, message: '请填写市场价', trigger: 'blur' }],
         number: [{ required: true, message: '请填写数量', trigger: 'blur' }]
       },
       attributeRules: {
@@ -378,21 +446,21 @@ export default {
         this.products = data.products
         this.attributes = data.attributes
         this.categoryIds = data.categoryIds
-        if (data.goods.gallery.length > 0) {
-          var gallery = []
-          data.goods.gallery.forEach(item => {
-            gallery.push({ url: item })
+        if (data.goods.albumPics.length > 0) {
+          var albumPics = []
+          data.goods.albumPics.forEach(item => {
+            albumPics.push({ url: item })
           })
-          this.gallery = gallery
+          this.albumPics = albumPics
         }
         if (data.goods.picUrl) {
           this.picUrl.push({ url: data.goods.picUrl })
         }
 
-        this.galleryFileList = []
-        for (var i = 0; i < this.goods.gallery.length; i++) {
-          this.galleryFileList.push({
-            url: this.goods.gallery[i]
+        this.albumPicsFileList = []
+        for (var i = 0; i < this.goods.albumPics.length; i++) {
+          this.albumPicsFileList.push({
+            url: this.goods.albumPics[i]
           })
         }
         const keywords = response.data.data.goods.keywords
@@ -411,8 +479,8 @@ export default {
       this.goods.categoryId = value[value.length - 1]
     },
     handleEdit() {
-      this.goods.goodsSn = this.goods.goodsSn.replace(/(^\s*)|(\s*$)/g, '')
-      this.goods.name = this.goods.name.replace(/(^\s*)|(\s*$)/g, '')
+      this.goods.brandId = this.goods.brandId.replace(/(^\s*)|(\s*$)/g, '')
+      this.goods.brandName = this.goods.brandName.replace(/(^\s*)|(\s*$)/g, '')
       this.$refs['goods'].validate(valid => {
         if (valid) {
           if (promptMessage(Array, this.specifications, '添加商品规格')) {
@@ -422,12 +490,12 @@ export default {
               } else {
                 this.goods.picUrl = ''
               }
-              if (this.gallery.length > 0) {
-                var galleryArr = []
-                this.gallery.forEach(item => {
-                  galleryArr.push(item.url)
+              if (this.albumPics.length > 0) {
+                var albumPicsArr = []
+                this.albumPics.forEach(item => {
+                  albumPicsArr.push(item.url)
                 })
-                this.goods.gallery = galleryArr
+                this.goods.albumPics = albumPicsArr
               }
               const finalGoods = {
                 goods: this.goods,
@@ -460,7 +528,7 @@ export default {
     },
     async fnUploadRequest(option) {
       oss.ossUploadFile(option).then(res => {
-        this.gallery.push({ url: res.fileUrl })
+        this.albumPics.push({ url: res.fileUrl })
       })
     },
     async fnUploadpicUrl(option) {
@@ -490,9 +558,9 @@ export default {
     },
     // 删除图片
     handleRemove(file, fileList) {
-      this.gallery.forEach((item, index) => {
+      this.albumPics.forEach((item, index) => {
         if (item.name === file.name) {
-          this.gallery.splice(index, 1)
+          this.albumPics.splice(index, 1)
         }
       })
     },
