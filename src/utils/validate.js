@@ -1,9 +1,5 @@
-/**
- * Created by jiachenpan on 16/11/18.
- */
-
 export function isvalidUsername(str) {
-  const valid_map = ['admin', 'editor']
+  const valid_map = ['admin', 'test']
   return valid_map.indexOf(str.trim()) >= 0
 }
 
@@ -26,17 +22,8 @@ export function validateUpperCase(str) {
 }
 
 /* 大小写字母*/
-export function validateAlphabets(str) {
+export function validatAlphabets(str) {
   const reg = /^[A-Za-z]+$/
   return reg.test(str)
 }
 
-/**
- * validate email
- * @param email
- * @returns {boolean}
- */
-export function validateEmail(email) {
-  const re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-  return re.test(email)
-}

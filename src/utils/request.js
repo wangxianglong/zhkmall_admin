@@ -1,103 +1,66 @@
 import axios from 'axios'
 import { Message, MessageBox } from 'element-ui'
-import store from '@/store'
+import store from '../store'
 import { getToken } from '@/utils/auth'
 
-// create an axios instance
+// 创建axios实例
 const service = axios.create({
-  baseURL: process.env.BASE_API, // api 的 base_url
-  timeout: 5000 // request timeout
+  baseURL: process.env.BASE_API, // api的base_url
+  timeout: 15000 // 请求超时时间
 })
 
-// request interceptor
-service.interceptors.request.use(
-  config => {
-    // Do something before request is sent
-    if (store.getters.token) {
-      // 让每个请求携带token-- ['X-Litemall-Admin-Token']为自定义key 请根据实际情况自行修改
-      config.headers['Bearer'] = getToken()
-    }
-    return config
-  },
-  error => {
-    // Do something with request error
-    console.log(error) // for debug
-    Promise.reject(error)
+// request拦截器
+service.interceptors.request.use(config => {
+  if (store.getters.token) {
+    config.headers['Authorization'] = getToken() // 让每个请求携带自定义token 请根据实际情况自行修改
   }
-)
+  return config
+}, error => {
+  // Do something with request error
+  console.log(error) // for debug
+  Promise.reject(error)
+})
 
-// response interceptor
+// respone拦截器
 service.interceptors.response.use(
   response => {
+  /**
+  * code为非200是抛错 可结合自己业务进行修改
+  */
     const res = response.data
-    if (response.status !== 200) {
+    if (res.code !== 200) {
       Message({
-        message: res.statusText,
+        message: res.message,
         type: 'error',
-        duration: 5 * 1000
+        duration: 3 * 1000
       })
-    }
-    if (res.code === 501) {
-      console.log('501')
-      MessageBox.alert('系统未登录，请重新登录', '错误', {
-        confirmButtonText: '确定',
-        type: 'error'
-      }).then(() => {
-        store.dispatch('FedLogOut').then(() => {
-          location.reload()
+
+      // 401:未登录;
+      if (res.code === 401||res.code === 403) {
+        MessageBox.confirm('你已被登出，可以取消继续留在该页面，或者重新登录', '确定登出', {
+          confirmButtonText: '重新登录',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          store.dispatch('FedLogOut').then(() => {
+            location.reload()// 为了重新实例化vue-router对象 避免bug
+          })
         })
-      })
+      }
       return Promise.reject('error')
-    } else if (res.code === 502) {
-      console.log('502')
-      MessageBox.alert('系统内部错误，请联系管理员维护', '错误', {
-        confirmButtonText: '确定',
-        type: 'error'
-      })
-      return Promise.reject('error')
-    } else if (res.code === 503) {
-      console.log('503')
-      MessageBox.alert('请求业务目前未支持', '警告', {
-        confirmButtonText: '确定',
-        type: 'error'
-      })
-      return Promise.reject('error')
-    } else if (res.code === 504) {
-      console.log('504')
-      MessageBox.alert('更新数据已经失效，请刷新页面重新操作', '警告', {
-        confirmButtonText: '确定',
-        type: 'error'
-      })
-      return Promise.reject('error')
-    } else if (res.code === 505) {
-      console.log('505')
-      MessageBox.alert('更新失败，请再尝试一次', '警告', {
-        confirmButtonText: '确定',
-        type: 'error'
-      })
-      return Promise.reject('error')
-    } else if (res.code === 506) {
-      console.log('506')
-      MessageBox.alert('没有操作权限，请联系管理员授权', '错误', {
-        confirmButtonText: '确定',
-        type: 'error'
-      })
-      return Promise.reject('error')
-    } else if (response.status !== 200) {
-      console.log('!200')
-      // 非5xx的错误属于业务错误，留给具体页面处理
-      return Promise.reject(response)
     } else {
       return response.data
     }
-  }, error => {
-    console.log(error)// for debug
+  },
+  error => {
+    console.log('err' + error)// for debug
     Message({
-      message: '连接出错（后台不能连接，请联系系统管理员）',
+      message: error.message,
       type: 'error',
-      duration: 5 * 1000
+      duration: 3 * 1000
     })
     return Promise.reject(error)
-  })
+  }
+)
 
 export default service
