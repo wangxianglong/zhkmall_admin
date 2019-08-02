@@ -39,7 +39,7 @@ export const constantRouterMap = [
     alwaysShow: true,
     name: 'userManage',
     meta: {
-      title: '用户',
+      title: '用户管理',
       icon: 'marker'
     },
     children: [
@@ -48,7 +48,7 @@ export const constantRouterMap = [
         component: () => import('@/views/user_manage/user'),
         name: 'user',
         meta: {
-          title: '用户管理',
+          title: '用户列表',
           icon: 'user',
           noCache: true
         }
@@ -60,7 +60,7 @@ export const constantRouterMap = [
     component: Layout,
     redirect: '/pms/product',
     name: 'pms',
-    meta: {title: '商品', icon: 'product'},
+    meta: {title: '商品管理', icon: 'product'},
     children: [{
       path: 'product',
       name: 'product',
@@ -168,7 +168,7 @@ export const constantRouterMap = [
     component: Layout,
     redirect: '/oms/order',
     name: 'oms',
-    meta: {title: '订单', icon: 'order'},
+    meta: {title: '订单管理', icon: 'order'},
     children: [
       {
         path: 'order',
@@ -321,6 +321,112 @@ export const constantRouterMap = [
         component: () => import('@/views/sms/advertise/update'),
         meta: {title: '编辑广告'},
         hidden:true
+      }
+    ]
+  },
+  {
+    path: '/platform',
+    component: Layout,
+    redirect: 'noredirect',
+    alwaysShow: true,
+    name: 'platformManage',
+    meta: {
+      title: '设置',
+      icon: 'order-setting'
+    },
+    children: [
+      {
+        path: 'basicSet',
+        component: () => import('@/views/platform/basicSet'),
+        name: 'basicSet',
+        meta: {
+          title: '基础配置',
+          icon: 'product',
+          noCache: true
+        }
+      },
+      {
+        path: 'languageSet',
+        component: () => import('@/views/platform/languageSet'),
+        name: 'languageSet',
+        meta: {
+          title: '语言配置',
+          icon: 'sms-ad',
+          noCache: true
+        }
+      },
+      {
+        path: 'currencySet',
+        component: () => import('@/views/platform/currencySet'),
+        name: 'currencySet',
+        meta: {
+          title: '货币配置',
+          icon: 'product-attr',
+          noCache: true
+        }
+      },
+      {
+        path: 'freightSet',
+        name: 'freightSet',
+        component: () => import('@/views/platform/freightSet/index'),
+        meta: {title: '运费配置', icon: 'sms-coupon'}
+      },
+      {
+        path: 'addFreightSet',
+        name: 'addFreightSet',
+        component: () => import('@/views/platform/freightSet/add'),
+        meta: {title: '添加运费配置'},
+        hidden: true
+      },
+      {
+        path: 'updateFreightSet',
+        name: 'updateFreightSet',
+        component: () => import('@/views/platform/freightSet/update'),
+        meta: {title: '修改运费配置'},
+        hidden: true
+      },
+      {
+        path: 'paymentSet',
+        component: () => import('@/views/platform/paymentSet'),
+        name: 'paymentSet',
+        meta: {
+          title: '支付配置',
+          icon: 'total-today',
+          noCache: true
+        }
+      }
+    ]
+  },
+  {
+    path: '/system',
+    component: Layout,
+    redirect: 'noredirect',
+    alwaysShow: true,
+    name: 'sysManage',
+    meta: {
+      title: '系统管理',
+      icon: 'tree'
+    },
+    children: [
+      {
+        path: 'admin',
+        component: () => import('@/views/system/admin'),
+        name: 'admin',
+        meta: {
+          title: '管理员',
+          icon: 'example',
+          noCache: true
+        }
+      },
+      {
+        path: 'role',
+        component: () => import('@/views/system/role'),
+        name: 'role',
+        meta: {
+          title: '角色管理',
+          icon: 'user',
+          noCache: true
+        }
       }
     ]
   },

@@ -120,7 +120,7 @@ export default {
       }
     },
     handleAddProductCate() {
-      this.$router.push('/pms/addProductCate');
+      this.$router.push('/platform/addFreightSet');
     },
     getList() {
       this.listLoading = true;
@@ -168,13 +168,13 @@ export default {
       });
     },
     handleShowNextLevel(index, row) {
-      this.$router.push({ path: '/pms/productCate', query: { parentId: row.id } })
+      this.$router.push({ path: '/platform/freightSet', query: { parentId: row.id } })
     },
     handleTransferProduct(index, row) {
       console.log('handleAddProductCate');
     },
     handleUpdate(index, row) {
-      this.$router.push({ path: '/pms/updateProductCate', query: { id: row.id } });
+      this.$router.push({ path: '/platform/updateFreightSet', query: { id: row.id } });
     },
     handleDelete(index, row) {
       this.$confirm('是否要删除该品牌', '提示', {

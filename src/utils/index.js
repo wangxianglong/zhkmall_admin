@@ -30,6 +30,42 @@ export function parseTime(time, cFormat) {
   return time_str
 }
 
+export const pickerOptions = {
+  shortcuts: [{
+    text: '今天',
+    onClick(picker) {
+      const end = new Date()
+      const start = new Date(new Date().toDateString())
+      end.setTime(start.getTime())
+      picker.$emit('pick', [start, end])
+    }
+  }, {
+    text: '最近一周',
+    onClick(picker) {
+      const end = new Date()
+      const start = new Date()
+      start.setTime(start.getTime() - 3600 * 1000 * 24 * 7)
+      picker.$emit('pick', [start, end])
+    }
+  }, {
+    text: '最近一个月',
+    onClick(picker) {
+      const end = new Date()
+      const start = new Date()
+      start.setTime(start.getTime() - 3600 * 1000 * 24 * 30)
+      picker.$emit('pick', [start, end])
+    }
+  }, {
+    text: '最近三个月',
+    onClick(picker) {
+      const end = new Date()
+      const start = new Date()
+      start.setTime(start.getTime() - 3600 * 1000 * 24 * 90)
+      picker.$emit('pick', [start, end])
+    }
+  }]
+}
+
 export function formatTime(time, option) {
   time = +time * 1000
   const d = new Date(time)
@@ -50,5 +86,31 @@ export function formatTime(time, option) {
     return parseTime(time, option)
   } else {
     return d.getMonth() + 1 + '月' + d.getDate() + '日' + d.getHours() + '时' + d.getMinutes() + '分'
+  }
+}
+
+export function promptMessage(dataType, data, msg) {
+  if (dataType === Array) {
+    if (data.length === 0) {
+      Message({
+        title: '警告',
+        message: `请${msg}`,
+        type: 'warning'
+      })
+      return false
+    } else {
+      return true
+    }
+  } else if (dataType === String) {
+    if (data) {
+      return true
+    } else {
+      Message({
+        title: '警告',
+        message: `请${msg}`,
+        type: 'warning'
+      })
+      return false
+    }
   }
 }

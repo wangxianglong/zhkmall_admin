@@ -79,13 +79,13 @@
       </el-table-column>
     </el-table>
 
-    <pagination
+    <!-- <pagination
       v-show="total>0"
       :total="total"
       :page.sync="listQuery.page"
       :limit.sync="listQuery.limit"
       @pagination="getList"
-    />
+    /> -->
 
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
       <el-form
@@ -166,14 +166,12 @@
 
 <script>
 import { listSlide, delSlide, addSlide, editSlide, statusSlide } from '@/api/platform'
-import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
 import oss from '@/utils/aliOss'
 import { pickerOptions, promptMessage } from '@/utils/index'
 import checkPermission from '@/utils/permission' // 权限判断函数
 
 export default {
   name: 'User',
-  components: { Pagination },
   filters: {
     formatPosition(position) {
       if (position === 1) {

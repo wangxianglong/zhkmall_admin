@@ -94,13 +94,13 @@
       </el-table-column>
     </el-table>
 
-    <pagination
+    <!-- <pagination
       v-show="total>0"
       :total="total"
       :page.sync="listQuery.page"
       :limit.sync="listQuery.limit"
       @pagination="getList"
-    />
+    /> -->
 
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
       <el-form
@@ -180,14 +180,12 @@
 
 <script>
 import { listStore, delStore, addStore, editStore, mapSearch, storeToDining, storeToMall } from '@/api/platform'
-import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
 import { promptMessage } from '@/utils/index'
 import * as city from '@/utils/city-data'
 import checkPermission from '@/utils/permission' // 权限判断函数
 
 export default {
   name: 'StoreManage',
-  components: { Pagination },
   data() {
     return {
       list: null,
