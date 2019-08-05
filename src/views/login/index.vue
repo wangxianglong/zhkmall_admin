@@ -53,22 +53,11 @@
       </el-form>
     </el-card>
     <img :src="login_center_bg" class="login-center-layout" />
-    <el-dialog title="特别赞助" :visible.sync="dialogVisible" width="30%">
-      <span>
-        mall项目已由CODING特别赞助，点击去支持，页面加载完后点击
-        <span class="color-main font-medium">免费体验</span>按钮即可完成支持，谢谢！
-      </span>
-      <span slot="footer" class="dialog-footer">
-        <el-button @click="dialogCancel">残忍拒绝</el-button>
-        <el-button type="primary" @click="dialogConfirm">去支持</el-button>
-      </span>
-    </el-dialog>
   </div>
 </template>
 
 <script>
 import { isvalidUsername } from '@/utils/validate';
-import { setSupport, getSupport, SupportUrl } from '@/utils/support';
 import login_center_bg from '@/assets/images/login_center_bg.png'
 
 export default {
@@ -99,8 +88,7 @@ export default {
       },
       loading: false,
       pwdType: 'password',
-      login_center_bg,
-      dialogVisible: false
+      login_center_bg
     }
   },
   methods: {
@@ -114,11 +102,6 @@ export default {
     handleLogin() {
       this.$refs.loginForm.validate(valid => {
         if (valid) {
-          let isSupport = getSupport();
-          if (isSupport === undefined || isSupport == null) {
-            this.dialogVisible = true;
-            return;
-          }
           this.loading = true;
           this.$store.dispatch('Login', this.loginForm).then(() => {
             this.loading = false;
@@ -131,15 +114,6 @@ export default {
           return false
         }
       })
-    },
-    dialogConfirm() {
-      this.dialogVisible = false;
-      setSupport(true);
-      window.location.href = SupportUrl;
-    },
-    dialogCancel() {
-      this.dialogVisible = false;
-      setSupport(false);
     }
   }
 }

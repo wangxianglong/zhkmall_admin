@@ -1,6 +1,23 @@
 <template>
   <el-card class="form-container" shadow="never">
-    <el-form :model="productCate" :rules="rules" ref="productCateFrom" label-width="150px">
+    <el-form :model="productCate" :rules="rules" ref="productCateFrom" label-width="100px">
+      <!-- <el-form-item>
+        <el-table ref="productCateTable" style="width: 100%" :data="mockData" border>
+          <template v-for="(col, index) in mockData">
+            <el-table-column label="重量" :key="index" align="center">
+              <template slot-scope="scope">
+                <span>{{scope}}</span>
+              </template>
+            </el-table-column>
+            <el-table-column label="价格" :key="index" align="center">
+              <template slot-scope="scope">
+                <el-input v-model="scope[1]"></el-input>
+              </template>
+            </el-table-column>
+          </template>
+        </el-table>
+      </el-form-item> -->
+
       <el-form-item label="配送名称：" prop="name">
         <el-input v-model="productCate.name"></el-input>
       </el-form-item>
@@ -35,11 +52,32 @@
         </el-select>
       </el-form-item>
       <el-form-item v-if="countData">
-        <span>{{ countData.desc }}</span>
-        <el-button @click="showResult">默认按钮</el-button>
-        <template v-for="itemData in countData.modules">
-          <div v-if="itemData.type === 'table'">
-            <edit-table ref="bxzTable" :data="weightTable" :columns="itemData.data"></edit-table>
+        <div v-for="item in countData.descArr" :key="item">{{item}}</div>
+        <template v-for="(itemData, index) in countData.modules">
+          <div :key="index">
+            <div class="table_tit">{{ itemData.desc }}</div>
+            <div v-if="itemData.type === 'table' || itemData.type === 'section'">
+              <el-button
+                type="primary"
+                icon="el-icon-circle-plus-outline"
+                @click.prevent="addRow(itemData.refs)"
+                size="small"
+              >添加行</el-button>
+              <el-button
+                type="danger"
+                icon="el-icon-remove-outline"
+                @click.prevent="delData(itemData.refs)"
+                size="small"
+              >删除行</el-button>
+            </div>
+            <edit-table
+              :ref="itemData.refs"
+              :table-type="itemData.type"
+              :data="itemData.data"
+              :columns="itemData.columns"
+              :show-header="itemData.showHead"
+              @selectlistRow="selectRow"
+            ></edit-table>
           </div>
         </template>
       </el-form-item>
@@ -99,21 +137,26 @@ export default {
     return {
       productCate: Object.assign({}, defaultProductCate),
       selectProductCateList: [],
-      weightTable: [],
       rules: {
         name: [
           { required: true, message: '请输入配送名称', trigger: 'blur' },
           { min: 2, max: 140, message: '长度在 2 到 140 个字符', trigger: 'blur' }
         ]
       },
+      mockData: [[0.5, 0], [1, 0], [1.5, 0], [2, 0], [2.5, 0], [3, 0]],
+      selectlistRow: [],
+      relatedNum: 1,
       countData: {},
       computational: [{
         id: 1,
         title: '按重量(首重+续重)',
-        desc: '运费 = 处理费 + (价格 * 重量)  请按照重量从小到大依次填写 /n  (重量单位: KG, 货币单位: US$1',
+        descArr: ['运费 = 处理费 + (价格 * 重量)', '请按照重量从小到大依次填写', '(重量单位: KG, 货币单位: US$1)'],
         modules: [{
           type: 'table',
-          data: [{
+          refs: 'threeTable',
+          data: [],
+          showHead: true,
+          columns: [{
             headName: '<=重量KG',
             value: 'weight'
           }, {
@@ -123,16 +166,227 @@ export default {
             headName: '价格',
             value: 'price'
           }]
+        }, {
+          type: 'astrict',
+          showHead: false,
+          desc: '屏蔽设置',
+          data: [{
+            condition: '价格<',
+            reference: '',
+            desc: '屏蔽不显示'
+          }, {
+            condition: '价格>',
+            reference: '',
+            desc: '屏蔽不显示'
+          }, {
+            condition: '重量<',
+            reference: '',
+            desc: '屏蔽不显示'
+          }, {
+            condition: '重量>',
+            reference: '',
+            desc: '屏蔽不显示'
+          }]
+        }, {
+          type: 'table',
+          refs: 'twoTable',
+          desc: '附加费',
+          data: [],
+          columns: [{
+            headName: '重量>=',
+            value: 'weight'
+          }, {
+            headName: '附加费',
+            value: 'charges'
+          }]
         }]
       }, {
         id: 2,
-        title: '统一固定收费'
+        title: '统一固定收费',
+        modules: [{
+          type: 'astrict',
+          showHead: false,
+          desc: '基本参数设置(重量单位: KG, 货币单位: US$1)',
+          data: [{
+            condition: '首重重量',
+            reference: ''
+          }, {
+            condition: '首重价格',
+            reference: ''
+          }, {
+            condition: '续重重量',
+            reference: ''
+          }, {
+            condition: '续重价格',
+            reference: ''
+          }]
+        }, {
+          type: 'table',
+          desc: '加箱子重量(总重量=商品重量+箱重)',
+          refs: 'threeTable',
+          data: [],
+          columns: [{
+            headName: '左区间>=',
+            value: 'left'
+          }, {
+            headName: '右区间<',
+            value: 'right'
+          }, {
+            headName: '箱重',
+            value: 'weight'
+          }]
+        }, {
+          type: 'astrict',
+          showHead: false,
+          desc: '免运费设置',
+          data: [{
+            condition: '价格>=',
+            reference: '',
+            desc: '免运费'
+          }, {
+            condition: '重量>=',
+            reference: '',
+            desc: '免运费'
+          }, {
+            condition: '件数>=',
+            reference: '',
+            desc: '免运费'
+          }]
+        }, {
+          type: 'astrict',
+          showHead: false,
+          desc: '屏蔽设置',
+          data: [{
+            condition: '价格<',
+            reference: '',
+            desc: '屏蔽不显示'
+          }, {
+            condition: '价格>',
+            reference: '',
+            desc: '屏蔽不显示'
+          }, {
+            condition: '重量<',
+            reference: '',
+            desc: '屏蔽不显示'
+          }, {
+            condition: '重量>',
+            reference: '',
+            desc: '屏蔽不显示'
+          }]
+        }]
       }, {
         id: 3,
-        title: '按重量(自定义)'
+        title: '按重量(自定义)',
+        descArr: ['1.采用累计计算方法, 运费 = 首重价格 + 区间续件价格1 + 区间续件价格2 + ...', '2.区间续重价格N = 第N个区间续重重量对应续重价格'],
+        modules: [{
+          type: 'astrict',
+          showHead: false,
+          desc: '首件规则设置(重量单位: KG, 货币单位: US$1)',
+          data: [{
+            condition: '首件数量',
+            reference: ''
+          }, {
+            condition: '首件价格',
+            reference: ''
+          }]
+        }, {
+          type: 'table',
+          desc: '续件规则设置',
+          refs: 'threeTable',
+          data: [],
+          columns: [{
+            headName: '<=区间件数的部分',
+            value: 'bodys'
+          }, {
+            headName: '续件数量',
+            value: 'count'
+          }, {
+            headName: '续件价格',
+            value: 'price'
+          }]
+        }, {
+          type: 'astrict',
+          showHead: false,
+          desc: '屏蔽设置',
+          data: [{
+            condition: '价格<',
+            reference: '',
+            desc: '屏蔽不显示'
+          }, {
+            condition: '价格>',
+            reference: '',
+            desc: '屏蔽不显示'
+          }, {
+            condition: '重量<',
+            reference: '',
+            desc: '屏蔽不显示'
+          }, {
+            condition: '重量>',
+            reference: '',
+            desc: '屏蔽不显示'
+          }]
+        }, {
+          type: 'table',
+          refs: 'twoTable',
+          desc: '附加费',
+          data: [],
+          columns: [{
+            headName: '重量>=',
+            value: 'weight'
+          }, {
+            headName: '附加费',
+            value: 'charges'
+          }]
+        }]
       }, {
         id: 4,
-        title: '按重量(首续重+大包裹)'
+        title: '按重量(首续重+大包裹)',
+        descArr: ['1.本公式的计算是基于价格, 免邮的商品也需要参与运费计算'],
+        modules: [{
+          type: 'section',
+          refs: 'priceTable',
+          showHead: true,
+          desc: '价格区间设置(货币单位: US$1)',
+          data: []
+        }, {
+          type: 'astrict',
+          showHead: false,
+          desc: '免运费设置',
+          data: [{
+            condition: '价格>=',
+            reference: '',
+            desc: '免运费'
+          }, {
+            condition: '重量>=',
+            reference: '',
+            desc: '免运费'
+          }, {
+            condition: '件数>=',
+            reference: '',
+            desc: '免运费'
+          }]
+        }, {
+          type: 'astrict',
+          showHead: false,
+          desc: '屏蔽设置',
+          data: [{
+            condition: '价格<',
+            reference: '',
+            desc: '屏蔽不显示'
+          }, {
+            condition: '价格>',
+            reference: '',
+            desc: '屏蔽不显示'
+          }, {
+            condition: '重量<',
+            reference: '',
+            desc: '屏蔽不显示'
+          }, {
+            condition: '重量>',
+            reference: '',
+            desc: '屏蔽不显示'
+          }]
+        }]
       }, {
         id: 5,
         title: '按重量(不同区间+不同续重)'
@@ -191,25 +445,64 @@ export default {
       this.computational.forEach(compItem => {
         if (val === compItem.id) {
           this.countData = compItem
-          var obj = {}
-          let tableData = []
-          this.weightTable = []
-          compItem.modules.forEach(modItem => {
-            if (modItem.type === 'table') {
-              tableData = modItem.data
-            }
-          })
-          tableData.forEach((tabItem, index) => {
-            obj[tabItem.value] = ''
-          })
-          for (let i = 0; i < 9; i++) {
-            this.weightTable.push(obj)
-          }
         }
       })
     },
     showResult() {
-      console.log(this.weightTable)
+      console.log(this.countData.modules)
+    },
+    selectRow(selectlistRow) {
+      this.selectlistRow = selectlistRow
+    },
+    // 增加行
+    addRow(refs) {
+      this.countData.modules.forEach(item => {
+        if (item.refs === refs) {
+          if (refs === 'priceTable') {
+            item.data.push({
+              sort: this.relatedNum,
+              totalPrice: '总价>',
+              price: '',
+              gather: '收取',
+              fixedCharge: '',
+              or: '或',
+              percentage: ''
+            })
+            this.relatedNum += 1
+          } else {
+            var list = {
+              sort: this.relatedNum
+            }
+            item.columns.forEach(item => {
+              list[item.value] = ''
+            })
+            item.data.push(list)
+            this.relatedNum += 1
+          }
+        }
+      })
+    },
+    // 删除选中行
+    delData(refs) {
+      this.countData.modules.forEach(item => {
+        if (item.refs === refs) {
+          for (let i = 0; i < this.selectlistRow.length; i++) {
+            var val = this.selectlistRow
+            // 获取选中行的索引的方法
+            // 遍历表格中data数据和选中的val数据，比较它们的sort,相等则输出选中行的索引
+            val.forEach((val, index) => {
+              item.data.forEach((v, i) => {
+                if (val.sort === v.sort) {
+                  // i 为选中的索引
+                  item.data.splice(i, 1)
+                }
+              })
+            })
+          }
+          // // 删除完数据之后清除勾选框
+          this.$refs[refs][0].$refs.relatedData.clearSelection()
+        }
+      })
     },
     getSelectProductCateList() {
       fetchList(0, { pageSize: 100, pageNum: 1 }).then(response => {
@@ -338,4 +631,7 @@ export default {
 </script>
 
 <style scoped>
+.table_tit {
+  font-weight: 600;
+}
 </style>
