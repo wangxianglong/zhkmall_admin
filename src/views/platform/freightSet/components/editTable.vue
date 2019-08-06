@@ -38,7 +38,7 @@
           <el-table-column align="center" label prop="condition" />
         </div>
       </div>
-      <div v-if="tableType === 'section'">
+      <div v-else-if="tableType === 'section'">
         <el-table-column type="selection" width="45" align="center" />
         <el-table-column align="center" label prop="totalPrice" />
         <el-table-column align="center" label="价格" prop="price">
@@ -58,6 +58,36 @@
             <el-input v-model="row.percentage"></el-input>
           </template>
         </el-table-column>
+      </div>
+      <div v-else-if="tableType === 'weightPrice'">
+        <el-table-column type="selection" width="45" align="center"></el-table-column>
+        <div v-for="n in interval" :key="n">
+          <el-table-column label="重量" align="center">
+            <template slot-scope="scope">
+              <span>{{ scope.row[n-1][0] }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="价格" align="center">
+            <template slot-scope="scope">
+              <el-input v-model="scope.row[n-1][1]"></el-input>
+            </template>
+          </el-table-column>
+        </div>
+      </div>
+      <div v-else-if="tableType === 'identify'">
+        <el-table-column type="selection" width="45" align="center"></el-table-column>
+        <div v-for="n in interval" :key="n">
+          <el-table-column align="center">
+            <template slot-scope="scope">
+              <span>{{ scope.row[n-1][0] }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column align="center">
+            <template slot-scope="scope">
+              <el-input v-model="scope.row[n-1][1]"></el-input>
+            </template>
+          </el-table-column>
+        </div>
       </div>
     </el-table>
   </div>
@@ -81,6 +111,7 @@ export default {
     return {
       selectlistRow: [],
       relatedNum: 1,
+      interval: 6
     }
   },
   props: {
@@ -97,6 +128,9 @@ export default {
       type: Array,
       default: () => []
     },
+  },
+  created() {
+    console.log(this.data)
   },
   methods: {
     // 获取表格选中时的数据
