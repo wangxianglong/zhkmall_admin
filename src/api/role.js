@@ -25,14 +25,14 @@ export function readRole(data) {
   })
 }
 // 编辑角色
-export function updateRole(data) {
+export function updateRole(id, data) {
   return request({
-    url: '/role/update',
+    url: `/role/update/${id}`,
     method: 'post',
     data
   })
 }
-// 删除角色
+// 批量删除角色
 export function deleteRole(data) {
   return request({
     url: '/role/delete',
@@ -40,18 +40,24 @@ export function deleteRole(data) {
     data
   })
 }
-// 获取角色权限
-export function getPermission(query) {
+// 获取层级结构所有权限
+export function getPermissionTree() {
   return request({
-    url: '/admin/role/permissions',
-    method: 'get',
-    params: query
+    url: 'permission/treeList',
+    method: 'get'
+  })
+}
+// 获取角色权限
+export function getRolePerm(id) {
+  return request({
+    url: `role/permission/${id}`,
+    method: 'get'
   })
 }
 // 更新角色权限
-export function updatePermission(data) {
+export function updatePermission(id, data) {
   return request({
-    url: '/admin/role/permissions',
+    url: `/role/permission/update/${id}`,
     method: 'post',
     data
   })

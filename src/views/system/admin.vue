@@ -1,157 +1,104 @@
 <template>
   <div class="app-container">
     <!-- 查询和其他操作 -->
-    <div class="filter-container">
-      <el-input
-        v-model="listQuery.username"
-        clearable
-        class="filter-item"
-        style="width: 200px;"
-        placeholder="请输入管理员用户名"
-      />
-      <el-button
-        v-permission="['GET /admin/admin/list']"
-        class="filter-item"
-        type="primary"
-        icon="el-icon-search"
-        @click="handleFilter"
-      >查找</el-button>
-      <el-button
-        v-permission="['POST /admin/admin/create']"
-        class="filter-item"
-        type="primary"
-        icon="el-icon-edit"
-        @click="handleCreate"
-      >添加</el-button>
-    </div>
+    <el-card class="filter-container" shadow="never">
+      <div>
+        <i class="el-icon-search"></i>
+        <span>筛选搜索</span>
+        <el-button style="float: right" @click="handleSearchList()" type="primary" size="small">查询结果</el-button>
+      </div>
+      <div style="margin-top: 15px">
+        <el-form :inline="true" :model="listQuery" size="small" label-width="140px">
+          <el-form-item label="输入搜索：">
+            <el-input
+              v-model="listQuery.name"
+              clearable
+              style="width: 203px;"
+              placeholder="请输入用户名"
+            />
+          </el-form-item>
+        </el-form>
+      </div>
+    </el-card>
+    <el-card class="operate-container" shadow="never">
+      <i class="el-icon-tickets"></i>
+      <span>数据列表</span>
+      <el-button class="btn-add" @click="handleCreate" size="mini">添加</el-button>
+    </el-card>
 
     <!-- 查询结果 -->
-    <el-table
-      v-loading="listLoading"
-      :data="list"
-      size="small"
-      element-loading-text="正在查询中。。。"
-      border
-      fit
-      highlight-current-row
-    >
-      <el-table-column align="center" width="100" label="ID" prop="id" sortable/>
-      <el-table-column align="center" width="130" label="用户名" prop="username"/>
-      <el-table-column align="center" width="100" label="姓名" prop="name"/>
-      <el-table-column align="center" width="130" label="管理员头像" prop="avatar">
-        <template slot-scope="scope">
-          <img v-if="scope.row.avatar" :src="scope.row.avatar" class="avatar">
-        </template>
-      </el-table-column>
-      <el-table-column align="center" width="100" label="性别" prop="gender">
-        <template slot-scope="scope">
-          <el-tag>{{ genderDic[scope.row.gender] }}</el-tag>
-        </template>
-      </el-table-column>
-      <el-table-column align="center" width="130" label="生日" prop="birthday"/>
-      <el-table-column align="center" width="100" label="员工号" prop="number"/>
-      <el-table-column align="center" label="管理员角色" prop="roleIds">
-        <template slot-scope="scope">
-          <el-tag
-            v-for="roleId in scope.row.roleIds"
-            :key="roleId"
-            type="primary"
-            style="margin-right: 20px;"
-          >{{ formatRole(roleId) }}</el-tag>
-        </template>
-      </el-table-column>
-      <el-table-column align="center" width="110" label="状态">
-        <template slot-scope="scope">
-          <el-tag :type="statusDic[scope.row.status].type">{{ statusDic[scope.row.status].desc }}</el-tag>
-        </template>
-      </el-table-column>
-      <el-table-column align="center" label="操作" class-name="small-padding fixed-width">
-        <template slot-scope="scope">
-          <el-button
-            v-permission="['POST /admin/admin/status']"
-            v-if="scope.row.status === 0"
-            size="mini"
-            type="info"
-            @click="upProduct(scope.$index, scope.row)"
-          >冻结</el-button>
-          <el-button
-            v-permission="['POST /admin/admin/status']"
-            v-else
-            size="mini"
-            type="primary"
-            @click="upProduct(scope.$index, scope.row)"
-          >启用</el-button>
-          <el-button
-            v-permission="['POST /admin/admin/update']"
-            type="primary"
-            size="mini"
-            @click="handleUpdate(scope.row)"
-          >编辑</el-button>
-          <el-button
-            v-permission="['POST /admin/admin/delete']"
-            type="danger"
-            size="mini"
-            @click="handleDelete(scope.$index, scope.row)"
-          >删除</el-button>
-        </template>
-      </el-table-column>
-    </el-table>
+    <div class="table-container">
+      <el-table
+        v-loading="listLoading"
+        :data="list"
+        size="small"
+        element-loading-text="正在查询中。。。"
+        border
+        fit
+        highlight-current-row
+      >
+        <!-- <el-table-column align="center" width="100px" label="用户ID" prop="id" sortable /> -->
+        <el-table-column align="center" width="100" label="用户名" prop="username" />
+        <el-table-column align="center" width="100" label="昵称" prop="nickName" />
+        <el-table-column align="center" width="100" label="性别" prop="gender">
+          <template slot-scope="scope">
+            <el-tag>{{ genderMap[scope.row.gender] }}</el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column align="center" label="电话" prop="phone" />
+        <el-table-column align="center" label="邮箱" prop="email" />
+        <el-table-column align="center" label="公司" prop="company" />
+        <el-table-column align="center" label="所在地址" prop="address" />
+        <el-table-column align="center" label="头像">
+          <template slot-scope="scope">
+            <img :src="scope.row.icon" style="width: 50px;border-radius: 50%;" alt="头像" />
+          </template>
+        </el-table-column>
+        <el-table-column align="center" label="状态" width="100" prop="status">
+          <template slot-scope="scope">
+            <el-tag>{{ statusDic[scope.row.status] }}</el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column align="center" label="备注信息" prop="note" />
+        <el-table-column align="center" label="创建时间" min-width="90" prop="createTime" />
+        <el-table-column align="center" label="最后登录时间" min-width="90" prop="loginTime" />
+        <el-table-column
+          align="center"
+          label="操作"
+          width="180"
+          class-name="small-padding fixed-width"
+        >
+          <template slot-scope="{ row }">
+            <el-button type="primary" size="mini" @click="handleUpdate(row)">编辑</el-button>
+            <el-button type="danger" size="mini" @click="handleDelete(row)">删除</el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+    </div>
 
-    <!-- <pagination
-      v-show="total>0"
-      :total="total"
-      :page.sync="listQuery.page"
-      :limit.sync="listQuery.limit"
-      @pagination="getList"
-    /> -->
+    <div class="pagination-container">
+      <el-pagination
+        background
+        @size-change="handleSizeChange"
+        @current-change="handleCurrentChange"
+        layout="total, sizes,prev, pager, next,jumper"
+        :page-size="listQuery.pageSize"
+        :page-sizes="[5,10,15]"
+        :current-page.sync="listQuery.pageNum"
+        :total="total"
+      ></el-pagination>
+    </div>
 
-    <!-- 添加或修改对话框 -->
-    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
+    <el-dialog :visible.sync="dialogFormVisible" :title="textMap[dialogStatus]">
       <el-form
         ref="dataForm"
         :rules="rules"
-        :model="dataForm"
-        status-icon
-        label-position="right"
-        label-width="100px"
+        :model="temp"
+        label-position="left"
+        label-width="90px"
         style="margin: 0 50px;"
       >
-        <el-form-item label="用户名">
-          <el-input
-            v-model="dataForm.username"
-            :disabled="dialogStatus==='create'?false:true"
-            placeholder="请输入用户名"
-          />
-        </el-form-item>
-        <el-form-item label="姓名" prop="name">
-          <el-input v-model="dataForm.name" placeholder="请输入姓名"/>
-        </el-form-item>
-        <el-form-item label="员工号">
-          <el-input
-            v-model="dataForm.number"
-            :disabled="dialogStatus==='create'?false:true"
-            placeholder="请输入员工号"
-          />
-        </el-form-item>
-        <el-form-item label="管理员密码" prop="password">
-          <el-input
-            v-model="dataForm.password"
-            type="password"
-            placeholder="请输入密码"
-            auto-complete="off"
-          />
-        </el-form-item>
-        <el-form-item label="管理员角色" prop="roleIds">
-          <el-select v-model="dataForm.roleIds" multiple placeholder="请选择">
-            <el-option
-              v-for="item in roleOptions"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value"
-            />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="管理员头像" prop="avatar">
+        <el-form-item label="头像：">
           <el-upload
             :http-request="fnUploadpicUrl"
             :show-file-list="true"
@@ -163,115 +110,158 @@
             list-type="picture-card"
             action
           >
-            <i class="el-icon-plus"/>
+            <i class="el-icon-plus" />
           </el-upload>
         </el-form-item>
-        <el-form-item label="生日">
-          <el-date-picker
-            v-model="dataForm.birthday"
-            type="date"
-            value-format="yyyy-MM-dd"
-            placeholder="选择日期"
-          />
+        <el-form-item label="用户名：" prop="username">
+          <el-input v-model="temp.username" placeholder="请输入用户名" />
         </el-form-item>
-        <el-form-item label="性别">
-          <el-radio-group v-model="dataForm.gender">
-            <el-radio :label="0">未知</el-radio>
-            <el-radio :label="1">男</el-radio>
-            <el-radio :label="2">女</el-radio>
-          </el-radio-group>
+        <el-form-item label="密码：" prop="password">
+          <el-input placeholder="请输入密码" v-model="temp.password" show-password></el-input>
+        </el-form-item>
+        <el-form-item label="昵称：" prop="nickName">
+          <el-input v-model="temp.nickName" placeholder="请输入昵称" />
+        </el-form-item>
+        <el-form-item label="性别：" prop="gender">
+          <el-select v-model="temp.gender" class="filter-item" placeholder="请选择">
+            <el-option
+              v-for="(item, key) in genderMap"
+              :key="key"
+              :label="item"
+              :value="Number(key)"
+            />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="电话：" prop="phone">
+          <el-input type="number" v-model="temp.phone" placeholder="请输入电话" />
+        </el-form-item>
+        <el-form-item label="邮箱：" prop="email">
+          <el-input v-model="temp.email" placeholder="请输入邮箱" />
+        </el-form-item>
+        <el-form-item label="公司：" prop="company">
+          <el-input v-model="temp.company" placeholder="请输入公司" />
+        </el-form-item>
+        <el-form-item label="所在地址：" prop="address">
+          <el-input v-model="temp.address" placeholder="请输入所在地址" />
+        </el-form-item>
+        <el-form-item label="状态：" prop="status">
+          <el-select v-model="temp.status" class="filter-item" placeholder="请选择">
+            <el-option
+              v-for="(item, index) in statusDic"
+              :key="index"
+              :label="item"
+              :value="index"
+            />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="备注信息：" prop="note">
+          <el-input v-model="temp.note" :rows="2" type="textarea" placeholder="请输入备注信息" />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">取消</el-button>
-        <el-button type="primary" @click="dialogStatus==='create'?createData():updateData()">确定</el-button>
+        <el-button type="primary" @click="dialogStatus==='create'?createData():updateData()">确认</el-button>
       </div>
     </el-dialog>
   </div>
 </template>
 
 <script>
-import { listAdmin, createAdmin, updateAdmin, deleteAdmin, statusAdmin } from '@/api/admin'
-import { roleOptions } from '@/api/role'
+import { fetchList, fetchDel, fetchEdit, fetchAdd } from '@/api/user'
+import { resolvingDate } from '@/utils/index'
 import oss from '@/utils/aliOss'
-import { promptMessage } from '@/utils/index'
-import checkPermission from '@/utils/permission' // 权限判断函数
 
 export default {
-  name: 'Admin',
+  name: 'User',
   data() {
+    var checkPhone = (rule, value, callback) => {
+      if (!value) {
+        return callback(new Error('手机号不能为空'));
+      } else {
+        const reg = /^1[3|4|5|7|8][0-9]\d{8}$/
+        console.log(reg.test(value));
+        if (reg.test(value)) {
+          callback();
+        } else {
+          return callback(new Error('请输入正确的手机号'));
+        }
+      }
+    }
     return {
       list: null,
       total: 0,
-      roleOptions: null,
       listLoading: true,
-      genderDic: ['未知', '男', '女'],
-      picUrl: [],
-      statusDic: [{
-        type: 'success',
-        desc: '正常'
-      }, {
-        type: 'info',
-        desc: '冻结'
-      }],
-      listQuery: {
-        page: 1,
-        limit: 20,
-        username: undefined,
-        sort: 'add_time',
-        order: 'desc'
-      },
-      dataForm: {
-        id: undefined,
-        username: undefined,
-        password: undefined,
-        avatar: undefined,
-        roleIds: []
-      },
       dialogFormVisible: false,
+      listQuery: {
+        pageNum: 1,
+        pageSize: 10,
+        name: undefined
+      },
+      temp: {
+        id: undefined,
+        address: '',
+        company: '',
+        email: '',
+        phone: '',
+        gender: 0,
+        icon: '',
+        nickName: '',
+        note: '',
+        password: '',
+        status: 1,
+        username: ''
+      },
+      picUrl: [],
+      statusDic: ['禁用', '启用'],
+      genderMap: { 0: '未知', 1: '男', 3: '女' },
       dialogStatus: '',
       textMap: {
         update: '编辑',
         create: '创建'
       },
       rules: {
-        name: [
-          { required: true, message: '管理员姓名不能为空', trigger: 'blur' }
+        username: [{ required: true, message: '请输入用户名', trigger: 'blur' }],
+        nickName: [{ required: true, message: '请输入昵称', trigger: 'blur' }],
+        password: [
+          { required: true, message: '请输入密码', trigger: 'blur' },
+          { pattern: /^([a-z0-9\.\@\!\#\$\%\^\&\*\(\)]){6,20}$/, message: '密码长度为 6 - 20位' }
         ],
-        roleIds: [
-          { required: true, message: '请选择角色', trigger: 'change' }
-        ],
-        password: [{ required: true, message: '密码不能为空', trigger: 'blur' }]
-      },
-      downloadLoading: false
+        phone: [{ validator: checkPhone, trigger: 'blur' }],
+        email: [
+          { required: true, message: '请输入邮箱地址', trigger: 'blur' },
+          { type: 'email', message: '请输入正确的邮箱地址', trigger: ['blur', 'change'] }
+        ]
+      }
     }
   },
   created() {
     this.getList()
-    roleOptions().then(response => {
-      this.roleOptions = response.data.data
-    })
   },
   methods: {
-    checkPermission,
-    formatRole(roleId) {
-      for (let i = 0; i < this.roleOptions.length; i++) {
-        if (roleId === this.roleOptions[i].value) {
-          return this.roleOptions[i].label
-        }
-      }
-      return ''
-    },
     getList() {
       this.listLoading = true
-      listAdmin(this.listQuery).then(response => {
-        this.list = response.data.data.items
-        this.total = response.data.data.total
+      fetchList(this.listQuery).then(response => {
+        let data = response.data.list
+        data.forEach(item => {
+          item.createTime = resolvingDate(item.createTime)
+          item.loginTime = resolvingDate(item.loginTime)
+        })
+        this.list = data
+        this.total = response.data.total
         this.listLoading = false
       })
     },
-    handleFilter() {
-      this.listQuery.page = 1
+    handleSizeChange(val) {
+      this.listQuery.pageNum = 1;
+      this.listQuery.pageSize = val;
+      this.getList();
+    },
+    handleCurrentChange(val) {
+      this.listQuery.pageNum = val;
+      this.getList();
+    },
+    handleSearchList() {
+      this.listQuery.pageNum = 1
       this.getList()
     },
     async fnUploadpicUrl(option) {
@@ -281,7 +271,11 @@ export default {
     },
     beforeAvatarUpload(file) {
       let isIMAGE = false
-      if (file.type === 'image/jpeg' || file.type === 'image/gif' || file.type === 'image/png') {
+      if (
+        file.type === 'image/jpeg' ||
+        file.type === 'image/gif' ||
+        file.type === 'image/png'
+      ) {
         isIMAGE = true
       }
       if (!isIMAGE) {
@@ -300,17 +294,19 @@ export default {
       })
     },
     resetForm() {
-      this.dataForm = {
-        id: undefined,
-        username: undefined,
-        password: undefined,
-        avatar: undefined,
-        roleIds: []
+      this.temp = {
+        address: '',
+        company: '',
+        email: '',
+        phone: '',
+        gender: 0,
+        nickName: '',
+        note: '',
+        password: '',
+        status: 1,
+        username: ''
       }
       this.picUrl = []
-    },
-    uploadAvatar(response) {
-      this.dataForm.avatar = response.data.url
     },
     handleCreate() {
       this.resetForm()
@@ -323,45 +319,26 @@ export default {
     createData() {
       this.$refs['dataForm'].validate(valid => {
         if (valid) {
-          if (promptMessage(String, this.dataForm.username, '输入用户名')) {
-            if (this.dataForm.username.length >= 6 && this.dataForm.username.length <= 20) {
-              if (promptMessage(String, this.dataForm.number, '输入员工号')) {
-                if (promptMessage(Array, this.dataForm.roleIds, '选择角色')) {
-                  if (this.picUrl.length > 0) {
-                    this.dataForm.avatar = this.picUrl[0].url
-                  }
-                  createAdmin(this.dataForm).then(response => {
-                    this.getList()
-                    this.dialogFormVisible = false
-                    this.$notify.success({
-                      title: '成功',
-                      message: '添加管理员成功'
-                    })
-                  })
-                }
-              }
-            } else {
-              this.$message({
-                message: '用户名长度为6-20个字符',
-                type: 'warning'
-              })
-            }
-          }
+          this.temp.icon = this.picUrl[0] ? this.picUrl[0].url : ''
+          fetchAdd(this.temp).then(response => {
+            this.dialogFormVisible = false
+            this.$notify.success({
+              title: '成功',
+              message: '添加管理员成功',
+              duration: 1500
+            })
+            this.getList()
+          })
         }
       })
     },
     handleUpdate(row) {
-      this.dataForm = Object.assign({}, row)
-      if (row.avatar) {
-        var picUrl = []
-        picUrl.push({
-          url: row.avatar
-        })
-        this.picUrl = picUrl
-      } else {
-        this.picUrl = []
-      }
+      this.temp = Object.assign({}, row)
       this.dialogStatus = 'update'
+      this.temp.password = ''
+      var picUrl = []
+      picUrl.push({ url: row.icon })
+      this.picUrl = picUrl
       this.dialogFormVisible = true
       this.$nextTick(() => {
         this.$refs['dataForm'].clearValidate()
@@ -370,62 +347,41 @@ export default {
     updateData() {
       this.$refs['dataForm'].validate(valid => {
         if (valid) {
-          if (this.picUrl.length > 0) {
-            this.dataForm.avatar = this.picUrl[0].url
-          }
-          updateAdmin(this.dataForm).then(() => {
+          this.temp.icon = this.picUrl[0].url
+          let params = Object.assign({}, this.temp)
+          delete params.createTime
+          delete params.loginTime
+          fetchEdit(this.temp.id, params).then(res => {
             for (const v of this.list) {
-              if (v.id === this.dataForm.id) {
+              if (v.id === this.temp.id) {
                 const index = this.list.indexOf(v)
-                this.list.splice(index, 1, this.dataForm)
+                this.list.splice(index, 1, this.temp)
                 break
               }
             }
             this.dialogFormVisible = false
-            this.$notify.success({
+            this.$notify({
               title: '成功',
-              message: '更新管理员成功'
+              message: '修改成功',
+              type: 'success',
+              duration: 2000
             })
           })
         }
       })
     },
-    handleDelete(index, row) {
+    handleDelete(row) {
       this.$confirm('是否删除管理员 ' + row.username + ' ?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        deleteAdmin({ id: row.id }).then(response => {
+        fetchDel(row.id).then(response => {
+          const index = this.list.indexOf(row)
           this.list.splice(index, 1)
-          this.$notify.success({
-            title: '成功',
-            message: '删除管理员成功'
-          })
-        })
-      })
-    },
-    upProduct(index, row) {
-      let str = ''
-      if (row.status === 0) {
-        str = '冻结'
-      } else {
-        str = '启用'
-      }
-      this.$confirm('是否' + str + '用户' + row.username + ' ?', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }).then(() => {
-        var setStatus = 0
-        if (row.status === 0) {
-          setStatus = 1
-        }
-        statusAdmin({ id: row.id, status: setStatus }).then(response => {
-          row.status = setStatus
           this.$message({
             type: 'success',
-            message: '修改成功!'
+            message: '删除成功!'
           })
         })
       })
@@ -433,11 +389,3 @@ export default {
   }
 }
 </script>
-
-<style>
-.avatar {
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-}
-</style>

@@ -25,3 +25,12 @@ export function fetchDel(query) {
     method: 'post'
   })
 }
+
+// 创建用户
+export function fetchAdd(query) {
+  return request({
+    url: 'admin/register',
+    method: 'post',
+    data: query
+  })
+}

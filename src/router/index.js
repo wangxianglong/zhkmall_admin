@@ -32,29 +32,29 @@ export const constantRouterMap = [
       meta: {title: '首页', icon: 'home'}
     }]
   },
-  {
-    path: '/user_manage',
-    component: Layout,
-    redirect: 'noredirect',
-    alwaysShow: true,
-    name: 'userManage',
-    meta: {
-      title: '用户管理',
-      icon: 'marker'
-    },
-    children: [
-      {
-        path: 'user',
-        component: () => import('@/views/user_manage/user'),
-        name: 'user',
-        meta: {
-          title: '用户列表',
-          icon: 'user',
-          noCache: true
-        }
-      }
-    ]
-  },
+  // {
+  //   path: '/user_manage',
+  //   component: Layout,
+  //   redirect: 'noredirect',
+  //   alwaysShow: true,
+  //   name: 'userManage',
+  //   meta: {
+  //     title: '用户管理',
+  //     icon: 'marker'
+  //   },
+  //   children: [
+  //     {
+  //       path: 'user',
+  //       component: () => import('@/views/user_manage/user'),
+  //       name: 'user',
+  //       meta: {
+  //         title: '用户列表',
+  //         icon: 'user',
+  //         noCache: true
+  //       }
+  //     }
+  //   ]
+  // },
   {
     path: '/pms',
     component: Layout,

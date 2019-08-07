@@ -84,7 +84,7 @@
           </el-table-column>
           <el-table-column align="center">
             <template slot-scope="scope">
-              <el-input v-model="scope.row[n-1][1]"></el-input>
+              <el-input v-model="scope.row[n-1][1]" v-if="scope.row[n-1][0]"></el-input>
             </template>
           </el-table-column>
         </div>
@@ -135,7 +135,7 @@ export default {
   methods: {
     // 获取表格选中时的数据
     selectRow(val) {
-      this.$emit("selectlistRow", val)
+      this.$emit('selectlistRow', val)
     }
   }
 }

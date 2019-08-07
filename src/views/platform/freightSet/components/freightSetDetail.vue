@@ -94,32 +94,26 @@
 </template>
 
 <script>
-import {
-  fetchList,
-  createProductCate,
-  updateProductCate,
-  getProductCate
-} from "@/api/productCate";
-import editTable from "./editTable";
-import { fetchListWithAttr } from "@/api/productAttrCate";
-import { getProductAttrInfo } from "@/api/productAttr";
-import SingleUpload from "@/components/Upload/singleUpload";
+import { fetchList, createProductCate, updateProductCate, getProductCate } from '@/api/productCate'
+import editTable from './editTable'
+import { fetchListWithAttr } from '@/api/productAttrCate'
+import { getProductAttrInfo } from '@/api/productAttr'
+import SingleUpload from '@/components/Upload/singleUpload'
 
 const defaultProductCate = {
-  description: "",
-  icon: "",
-  keywords: "",
-  name: "",
+  description: '',
+  icon: '',
+  keywords: '',
+  name: '',
   navStatus: 0,
   parentId: 0,
-  formulaId: undefined,
-  productUnit: "",
+  productUnit: '',
   showStatus: 0,
   sort: 0,
   productAttributeIdList: []
-};
+}
 export default {
-  name: "ProductCateDetail",
+  name: 'ProductCateDetail',
   components: { SingleUpload, editTable },
   props: {
     isEdit: {
@@ -133,19 +127,14 @@ export default {
       selectProductCateList: [],
       rules: {
         name: [
-          { required: true, message: "请输入配送名称", trigger: "blur" },
-          {
-            min: 2,
-            max: 140,
-            message: "长度在 2 到 140 个字符",
-            trigger: "blur"
-          }
+          { required: true, message: '请输入配送名称', trigger: 'blur' },
+          { min: 2, max: 140, message: '长度在 2 到 140 个字符', trigger: 'blur' }
         ]
       },
       startNum: 0.5,
       endNum: 51,
       interval: 6,
-      identifyVal: '',
+      identifyVal: undefined,
       selectlistRow: [],
       relatedNum: 1,
       countData: {},
@@ -413,43 +402,36 @@ export default {
             {
               type: "identify",
               showHead: false,
-              desc: "重量鑒定檔 KG",
+              desc: "重量鑒定檔 KG(步长1)",
+              step: 1,
               showGenerate: true,
               generateDesc: '小包裹運費設置',
               data: []
-            },
-            {
-              type: "astrict",
-              showHead: false,
-              desc: "屏蔽设置",
-              data: [
-                {
-                  condition: "价格<",
-                  reference: "",
-                  desc: "屏蔽不显示"
-                },
-                {
-                  condition: "价格>",
-                  reference: "",
-                  desc: "屏蔽不显示"
-                },
-                {
-                  condition: "重量<",
-                  reference: "",
-                  desc: "屏蔽不显示"
-                },
-                {
-                  condition: "重量>",
-                  reference: "",
-                  desc: "屏蔽不显示"
-                }
-              ]
             }
           ]
         },
         {
           id: 5,
-          title: "按重量(不同区间+不同续重)"
+          title: "按重量(不同区间+不同续重)",
+          descArr: ["1.本公式的计算是基于价格, 免邮的商品也需要参与运费计算"],
+          modules: [
+            {
+              type: "section",
+              refs: "priceTable",
+              showHead: true,
+              desc: "价格区间设置(货币单位: US$1)",
+              data: []
+            },
+            {
+              type: "identify",
+              showHead: false,
+              desc: "重量鑒定檔 KG(步长0.5)",
+              step: 0.5,
+              showGenerate: true,
+              generateDesc: '小包裹運費設置',
+              data: []
+            }
+          ]
         },
         {
           id: 6,
@@ -486,16 +468,16 @@ export default {
           value: []
         }
       ]
-    };
+    }
   },
   created() {
     if (this.isEdit) {
       getProductCate(this.$route.query.id).then(response => {
-        this.productCate = response.data;
-      });
+        this.productCate = response.data
+      })
       getProductAttrInfo(this.$route.query.id).then(response => {
         if (response.data != null && response.data.length > 0) {
-          this.filterProductAttrList = [];
+          this.filterProductAttrList = []
           for (let i = 0; i < response.data.length; i++) {
             this.filterProductAttrList.push({
               key: Date.now() + i,
@@ -503,48 +485,49 @@ export default {
                 response.data[i].attributeCategoryId,
                 response.data[i].attributeId
               ]
-            });
+            })
           }
         }
-      });
+      })
     } else {
-      this.productCate = Object.assign({}, defaultProductCate);
+      this.productCate = Object.assign({}, defaultProductCate)
     }
-    this.getSelectProductCateList();
-    this.getProductAttrCateList();
+    this.getSelectProductCateList()
+    this.getProductAttrCateList()
     this.computational.forEach(item => {
       if (item.modules) {
         item.modules.forEach(modItem => {
           if (modItem.type === "weightPrice") {
-            modItem.data = this.generatedData(this.startNum, this.endNum, 0.5);
+            modItem.data = this.generatedData(this.startNum, this.endNum, 0.5)
           }
-        });
+        })
       }
-    });
+    })
   },
   methods: {
     showComputational(val) {
       this.computational.forEach(compItem => {
         if (val === compItem.id) {
-          this.countData = compItem;
+          this.identifyVal = undefined
+          compItem.modules.forEach(modItem => {
+            if (!modItem.showGenerate) {
+              modItem.showGenerate = true
+            }
+          })
+          this.countData = compItem
         }
-      });
+      })
     },
     generatedData(startNum, endNum, interval) {
-      var result = [];
-      var mockData = [];
+      let result = []
+      let mockData = []
       for (let i = startNum; i <= endNum; i += interval) {
-        result.push([i.toFixed(1), ""]);
+        result.push([i.toFixed(1), ''])
       }
-      // var index = 0;
-      // while (index < result.length) {
-
-      // }
-      // console.log(result)
       for (let i = 0; i < result.length; i++) {
         var newResult = result.slice(i, (i += this.interval))
         if (newResult.length === this.interval) {
-          mockData.push(newResult);
+          mockData.push(newResult)
         } else {
           let addNum = Number(newResult[0][0]) - 1
           let arr = newResult.unshift([addNum.toFixed(1), ''])
@@ -552,210 +535,207 @@ export default {
           for (let y = 0; y < num; y++) {
             newResult.push(['', ''])
           }
-          mockData.push(newResult);
+          mockData.push(newResult)
         }
       }
+
       return mockData
     },
     generateform(data) {
-      data.data = this.generatedData(1, this.identifyVal, 1)
+      data.data = this.generatedData(data.step, this.identifyVal, data.step)
       // console.log(this.countData)
       data.showGenerate = false
     },
     showResult() {
-      console.log(this.countData.modules);
+      console.log(this.countData.modules)
     },
     selectRow(selectlistRow) {
-      this.selectlistRow = selectlistRow;
+      this.selectlistRow = selectlistRow
     },
     // 增加行
     addRow(refs) {
       this.countData.modules.forEach(item => {
         if (item.refs === refs) {
-          if (refs === "priceTable") {
+          if (refs === 'priceTable') {
             item.data.push({
               sort: this.relatedNum,
-              totalPrice: "总价>",
-              price: "",
-              gather: "收取",
-              fixedCharge: "",
-              or: "或",
-              percentage: ""
-            });
-            this.relatedNum += 1;
+              totalPrice: '总价>',
+              price: '',
+              gather: '收取',
+              fixedCharge: '',
+              or: '或',
+              percentage: ''
+            })
+            this.relatedNum += 1
           } else {
             var list = {
               sort: this.relatedNum
-            };
+            }
             item.columns.forEach(item => {
-              list[item.value] = "";
-            });
-            item.data.push(list);
-            this.relatedNum += 1;
+              list[item.value] = ''
+            })
+            item.data.push(list)
+            this.relatedNum += 1
           }
         }
-      });
+      })
     },
     // 删除选中行
     delData(refs) {
       this.countData.modules.forEach(item => {
         if (item.refs === refs) {
           for (let i = 0; i < this.selectlistRow.length; i++) {
-            var val = this.selectlistRow;
+            var val = this.selectlistRow
             // 获取选中行的索引的方法
             // 遍历表格中data数据和选中的val数据，比较它们的sort,相等则输出选中行的索引
             val.forEach((val, index) => {
               item.data.forEach((v, i) => {
                 if (val.sort === v.sort) {
                   // i 为选中的索引
-                  item.data.splice(i, 1);
+                  item.data.splice(i, 1)
                 }
-              });
-            });
+              })
+            })
           }
           // // 删除完数据之后清除勾选框
-          this.$refs[refs][0].$refs.relatedData.clearSelection();
+          this.$refs[refs][0].$refs.relatedData.clearSelection()
         }
-      });
+      })
     },
     getSelectProductCateList() {
       fetchList(0, { pageSize: 100, pageNum: 1 }).then(response => {
-        this.selectProductCateList = response.data.list;
-        this.selectProductCateList.unshift({ id: 0, name: "无上级分类" });
-      });
+        this.selectProductCateList = response.data.list
+        this.selectProductCateList.unshift({ id: 0, name: '无上级分类' })
+      })
     },
     getProductAttrCateList() {
       fetchListWithAttr().then(response => {
-        let list = response.data;
+        let list = response.data
         for (let i = 0; i < list.length; i++) {
-          let productAttrCate = list[i];
-          let children = [];
+          let productAttrCate = list[i]
+          let children = []
           if (
             productAttrCate.productAttributeList != null &&
             productAttrCate.productAttributeList.length > 0
           ) {
-            for (
-              let j = 0;
-              j < productAttrCate.productAttributeList.length;
-              j++
-            ) {
+            for (let j = 0; j < productAttrCate.productAttributeList.length; j++) {
               children.push({
                 label: productAttrCate.productAttributeList[j].name,
                 value: productAttrCate.productAttributeList[j].id
-              });
+              })
             }
           }
           this.filterAttrs.push({
             label: productAttrCate.name,
             value: productAttrCate.id,
             children: children
-          });
+          })
         }
-      });
+      })
     },
     getProductAttributeIdList() {
       //获取选中的筛选商品属性
-      let productAttributeIdList = [];
+      let productAttributeIdList = []
       for (let i = 0; i < this.filterProductAttrList.length; i++) {
-        let item = this.filterProductAttrList[i];
+        let item = this.filterProductAttrList[i]
         if (item.value !== null && item.value.length === 2) {
-          productAttributeIdList.push(item.value[1]);
+          productAttributeIdList.push(item.value[1])
         }
       }
-      return productAttributeIdList;
+      return productAttributeIdList
     },
     onSubmit(formName) {
       this.$refs[formName].validate(valid => {
         if (valid) {
-          this.$confirm("是否提交数据", "提示", {
-            confirmButtonText: "确定",
-            cancelButtonText: "取消",
-            type: "warning"
+          this.$confirm('是否提交数据', '提示', {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            type: 'warning'
           }).then(() => {
             if (this.isEdit) {
-              this.productCate.productAttributeIdList = this.getProductAttributeIdList();
+              this.productCate.productAttributeIdList = this.getProductAttributeIdList()
               updateProductCate(this.$route.query.id, this.productCate).then(
                 response => {
                   this.$message({
-                    message: "修改成功",
-                    type: "success",
+                    message: '修改成功',
+                    type: 'success',
                     duration: 1000
-                  });
-                  this.$router.back();
+                  })
+                  this.$router.back()
                 }
-              );
+              )
             } else {
-              this.productCate.productAttributeIdList = this.getProductAttributeIdList();
+              this.productCate.productAttributeIdList = this.getProductAttributeIdList()
               createProductCate(this.productCate).then(response => {
-                this.$refs[formName].resetFields();
-                this.resetForm(formName);
+                this.$refs[formName].resetFields()
+                this.resetForm(formName)
                 this.$message({
-                  message: "提交成功",
-                  type: "success",
+                  message: '提交成功',
+                  type: 'success',
                   duration: 1000
-                });
-              });
+                })
+              })
             }
-          });
+          })
         } else {
           this.$message({
-            message: "验证失败",
-            type: "error",
+            message: '验证失败',
+            type: 'error',
             duration: 1000
-          });
-          return false;
+          })
+          return false
         }
-      });
+      })
     },
     resetForm(formName) {
-      this.$refs[formName].resetFields();
-      this.productCate = Object.assign({}, defaultProductCate);
-      this.getSelectProductCateList();
+      this.$refs[formName].resetFields()
+      this.productCate = Object.assign({}, defaultProductCate)
+      this.getSelectProductCateList()
       this.filterProductAttrList = [
         {
           value: []
         }
-      ];
+      ]
     },
     removeFilterAttr(productAttributeId) {
       if (this.filterProductAttrList.length === 1) {
         this.$message({
-          message: "至少要留一个",
-          type: "warning",
+          message: '至少要留一个',
+          type: 'warning',
           duration: 1000
-        });
-        return;
+        })
+        return
       }
-      var index = this.filterProductAttrList.indexOf(productAttributeId);
+      var index = this.filterProductAttrList.indexOf(productAttributeId)
       if (index !== -1) {
-        this.filterProductAttrList.splice(index, 1);
+        this.filterProductAttrList.splice(index, 1)
       }
     },
     handleAddFilterAttr() {
       if (this.filterProductAttrList.length === 3) {
         this.$message({
-          message: "最多添加三个",
-          type: "warning",
+          message: '最多添加三个',
+          type: 'warning',
           duration: 1000
-        });
-        return;
+        })
+        return
       }
       this.filterProductAttrList.push({
         value: null,
         key: Date.now()
-      });
+      })
     }
   },
   filters: {
     filterLabelFilter(index) {
       if (index === 0) {
-        return "筛选属性：";
+        return '筛选属性：'
       } else {
-        return "";
+        return ''
       }
     }
   }
-};
+}
 </script>
 
 <style scoped>
