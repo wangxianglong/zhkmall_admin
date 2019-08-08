@@ -56,6 +56,27 @@ export const constantRouterMap = [
   //   ]
   // },
   {
+    path: '/profile',
+    component: Layout,
+    redirect: 'noredirect',
+    alwaysShow: true,
+    children: [
+      {
+        path: 'userCenter',
+        component: () => import('@/views/profile/userCenter'),
+        name: 'userCenter',
+        meta: { title: '个人中心', noCache: true }
+      },
+      {
+        path: 'password',
+        component: () => import('@/views/profile/password'),
+        name: 'password',
+        meta: { title: '修改密码', noCache: true }
+      }
+    ],
+    hidden: true
+  },
+  {
     path: '/pms',
     component: Layout,
     redirect: '/pms/product',

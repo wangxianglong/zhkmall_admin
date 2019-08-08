@@ -69,14 +69,15 @@
         v-loading="listLoading"
         border
       >
-        <el-table-column type="selection" width="60" align="center"></el-table-column>
-        <el-table-column align="center" width="100" label="ID" prop="id"/>
+        <el-table-column type="selection" width="50" align="center"></el-table-column>
+        <!-- <el-table-column align="center" width="100" label="ID" prop="id"/> -->
+        <el-table-column align="center" width="75" label="排序" prop="sort" sortable />
         <el-table-column label="商品图片" width="120" align="center">
           <template slot-scope="scope">
-            <img style="height: 80px" :src="scope.row.pic" />
+            <img style="height: 80px" :src="scope.row.pic" :alt="scope.row.name" />
           </template>
         </el-table-column>
-        <el-table-column label="商品名称" align="center">
+        <el-table-column label="商品名称" min-width="110" align="center">
           <template slot-scope="scope">
             <p>{{scope.row.name}}</p>
             <p>品牌：{{scope.row.brandName}}</p>
@@ -85,42 +86,46 @@
         <el-table-column label="价格/货号" width="150" align="center">
           <template slot-scope="scope">
             <p>价格：￥{{scope.row.price}}</p>
-            <p>促销价：￥{{scope.row.promotionPrice}}</p>
+            <p>促销价：{{ scope.row.promotionPrice? `￥${scope.row.promotionPrice}`: '无' }}</p>
             <p>货号：{{scope.row.productSn}}</p>
           </template>
         </el-table-column>
-        <el-table-column label="标签" width="140" align="center">
+        <el-table-column label="标签" width="230" align="center">
           <template slot-scope="scope">
             <p>
               上架：
               <el-switch
-                @change="handlePublishStatusChange(scope.$index, scope.row)"
+                @change="handleStatusChange(scope.row, 'publishStatus')"
                 :active-value="1"
                 :inactive-value="0"
                 v-model="scope.row.publishStatus"
-              ></el-switch>
+                style="margin-right: 15px;"
+              />删除：
+              <el-switch
+                @change="handleStatusChange(scope.row, 'deleteStatus')"
+                :active-value="1"
+                :inactive-value="0"
+                v-model="scope.row.deleteStatus"
+              />
             </p>
             <p>
               新品：
               <el-switch
-                @change="handleNewStatusChange(scope.$index, scope.row)"
+                @change="handleStatusChange(scope.row, 'newStatus')"
                 :active-value="1"
                 :inactive-value="0"
                 v-model="scope.row.newStatus"
-              ></el-switch>
-            </p>
-            <p>
-              推荐：
+                style="margin-right: 15px;"
+              />推荐：
               <el-switch
-                @change="handleRecommendStatusChange(scope.$index, scope.row)"
+                @change="handleStatusChange(scope.row, 'recommandStatus')"
                 :active-value="1"
                 :inactive-value="0"
                 v-model="scope.row.recommandStatus"
-              ></el-switch>
+              />
             </p>
           </template>
         </el-table-column>
-        <el-table-column align="center" width="100" label="排序" prop="sort"/>
         <el-table-column label="SKU库存" width="100" align="center">
           <template slot-scope="scope">
             <el-button
@@ -131,7 +136,7 @@
             ></el-button>
           </template>
         </el-table-column>
-        <el-table-column align="center" width="100" label="销量" prop="sale"/>
+        <el-table-column align="center" width="100" label="销量" prop="sale" />
         <el-table-column label="审核状态" width="100" align="center">
           <template slot-scope="scope">
             <p>{{scope.row.verifyStatus | verifyStatusFilter}}</p>
@@ -155,13 +160,8 @@
       </el-table>
     </div>
     <div class="batch-operate-container">
-      <el-select size="small" v-model="operateType" placeholder="批量操作">
-        <el-option
-          v-for="item in operates"
-          :key="item.value"
-          :label="item.label"
-          :value="item.value"
-        ></el-option>
+      <el-select size="small" v-model="operateType" clearable placeholder="批量操作">
+        <el-option v-for="item in operates" :key="item.value" :label="item.label" :value="item"></el-option>
       </el-select>
       <el-button
         style="margin-left: 20px"
@@ -270,38 +270,46 @@ export default {
       operates: [
         {
           label: "商品上架",
-          value: "publishOn"
+          statusType: "publishStatus",
+          status: 1
         },
         {
           label: "商品下架",
-          value: "publishOff"
+          statusType: "publishStatus",
+          status: 0
         },
         {
           label: "设为推荐",
-          value: "recommendOn"
+          statusType: "recommandStatus",
+          status: 1
         },
         {
           label: "取消推荐",
-          value: "recommendOff"
+          statusType: "recommandStatus",
+          status: 0
         },
         {
           label: "设为新品",
-          value: "newOn"
+          statusType: "newStatus",
+          status: 1
         },
         {
           label: "取消新品",
-          value: "newOff"
+          statusType: "newStatus",
+          status: 0
         },
         {
-          label: "转移到分类",
-          value: "transferCategory"
+          label: "设为删除",
+          statusType: "deleteStatus",
+          status: 1
         },
         {
-          label: "移入回收站",
-          value: "recycle"
+          label: "取消删除",
+          statusType: "deleteStatus",
+          status: 0
         }
       ],
-      operateType: null,
+      operateType: {},
       listQuery: Object.assign({}, defaultListQuery),
       list: null,
       total: null,
@@ -363,7 +371,6 @@ export default {
     getList() {
       this.listLoading = true;
       fetchList(this.listQuery).then(response => {
-        console.log(response)
         this.listLoading = false;
         this.list = response.data.list;
         this.total = response.data.total;
@@ -442,6 +449,22 @@ export default {
     handleAddProduct() {
       this.$router.push({ path: '/pms/addProduct' });
     },
+    operateCallBack(statusType, status) {
+      this.list.forEach(item => {
+        ids.forEach(val => {
+          if (item.id === val) {
+            item[statusType] = status
+            // 修改完数据之后清除勾选框
+            this.$refs.productTable.clearSelection()
+          }
+        })
+      })
+      this.$message({
+        message: '修改成功',
+        type: 'success',
+        duration: 1000
+      });
+    },
     handleBatchOperate() {
       if (this.operateType == null) {
         this.$message({
@@ -468,35 +491,47 @@ export default {
         for (let i = 0; i < this.multipleSelection.length; i++) {
           ids.push(this.multipleSelection[i].id);
         }
-        switch (this.operateType) {
-          case this.operates[0].value:
-            this.updatePublishStatus(1, ids);
-            break;
-          case this.operates[1].value:
-            this.updatePublishStatus(0, ids);
-            break;
-          case this.operates[2].value:
-            this.updateRecommendStatus(1, ids);
-            break;
-          case this.operates[3].value:
-            this.updateRecommendStatus(0, ids);
-            break;
-          case this.operates[4].value:
-            this.updateNewStatus(1, ids);
-            break;
-          case this.operates[5].value:
-            this.updateNewStatus(0, ids);
-            break;
-          case this.operates[6].value:
-            break;
-          case this.operates[7].value:
-            this.updateDeleteStatus(1, ids);
-            break;
-          default:
-            break;
-        }
-        this.getList();
+        let statusType = this.operateType.statusType
+        let status = this.operateType.status
+        this.handleEditStatus(ids, statusType, status)
+        // this.getList();
       });
+    },
+    handleEditStatus(ids, statusType, status) {
+      let params = new URLSearchParams();
+      params.append('ids', ids);
+      params.append(statusType, status)
+      console.log(params)
+
+      switch (statusType) {
+        case 'publishStatus':
+          updatePublishStatus(params).then(response => {
+            this.operateCallBack(statusType, status)
+          })
+          break;
+        case 'recommandStatus':
+          updateRecommendStatus(params).then(response => {
+            this.operateCallBack(statusType, status)
+          });
+          break;
+        case 'newStatus':
+          updateNewStatus(params).then(response => {
+            this.operateCallBack(statusType, status)
+          });
+          break;
+        case 'deleteStatus':
+          updateDeleteStatus(params).then(response => {
+            this.operateCallBack(statusType, status)
+          });
+          break;
+        default:
+          this.$message({
+            message: '请选择操作类型',
+            type: 'warning',
+            duration: 1000
+          });
+          break;
+      }
     },
     handleSizeChange(val) {
       this.listQuery.pageNum = 1;
@@ -510,20 +545,27 @@ export default {
     handleSelectionChange(val) {
       this.multipleSelection = val;
     },
-    handlePublishStatusChange(index, row) {
-      let ids = [];
-      ids.push(row.id);
-      this.updatePublishStatus(row.publishStatus, ids);
+
+    handleStatusChange(row, statusType) {
+      this.$confirm('是否要进行该操作?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        let ids = [];
+        ids.push(row.id);
+        this.handleEditStatus(ids, statusType, row.publishStatus)
+      })
     },
     handleNewStatusChange(index, row) {
       let ids = [];
       ids.push(row.id);
-      this.updateNewStatus(row.newStatus, ids);
+      this.handleEditStatus(ids, 'newStatus', row.newStatus)
     },
     handleRecommendStatusChange(index, row) {
       let ids = [];
       ids.push(row.id);
-      this.updateRecommendStatus(row.recommandStatus, ids);
+      this.handleEditStatus(ids, 'recommandStatus', row.recommandStatus)
     },
     handleResetSearch() {
       this.selectProductCateValue = [];
@@ -551,55 +593,6 @@ export default {
     },
     handleShowLog(index, row) {
       console.log("handleShowLog", row);
-    },
-    updatePublishStatus(publishStatus, ids) {
-      let params = new URLSearchParams();
-      params.append('ids', ids);
-      params.append('publishStatus', publishStatus);
-      updatePublishStatus(params).then(response => {
-        this.$message({
-          message: '修改成功',
-          type: 'success',
-          duration: 1000
-        });
-      });
-    },
-    updateNewStatus(newStatus, ids) {
-      let params = new URLSearchParams();
-      params.append('ids', ids);
-      params.append('newStatus', newStatus);
-      updateNewStatus(params).then(response => {
-        this.$message({
-          message: '修改成功',
-          type: 'success',
-          duration: 1000
-        });
-      });
-    },
-    updateRecommendStatus(recommendStatus, ids) {
-      let params = new URLSearchParams();
-      params.append('ids', ids);
-      params.append('recommendStatus', recommendStatus);
-      updateRecommendStatus(params).then(response => {
-        this.$message({
-          message: '修改成功',
-          type: 'success',
-          duration: 1000
-        });
-      });
-    },
-    updateDeleteStatus(deleteStatus, ids) {
-      let params = new URLSearchParams();
-      params.append('ids', ids);
-      params.append('deleteStatus', deleteStatus);
-      updateDeleteStatus(params).then(response => {
-        this.$message({
-          message: '删除成功',
-          type: 'success',
-          duration: 1000
-        });
-      });
-      this.getList();
     }
   }
 }

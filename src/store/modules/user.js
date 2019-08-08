@@ -6,6 +6,8 @@ const user = {
     token: getToken(),
     name: '',
     avatar: '',
+    company: '',
+    userid: '',
     roles: []
   },
 
@@ -18,6 +20,12 @@ const user = {
     },
     SET_AVATAR: (state, avatar) => {
       state.avatar = avatar
+    },
+    SET_COMPANY: (state, company) => {
+      state.company = company
+    },
+    SET_USERID: (state, userid) => {
+      state.userid = userid
     },
     SET_ROLES: (state, roles) => {
       state.roles = roles
@@ -44,7 +52,7 @@ const user = {
     // 获取用户信息
     GetInfo({ commit, state }) {
       return new Promise((resolve, reject) => {
-        getInfo({ username: 'admin' }).then(response => {
+        getInfo().then(response => {
           const data = response.data
           if (data.roles && data.roles.length > 0) { // 验证返回的roles是否是一个非空数组
             commit('SET_ROLES', data.roles)
@@ -53,6 +61,8 @@ const user = {
           }
           commit('SET_NAME', data.username)
           commit('SET_AVATAR', data.icon)
+          commit('SET_USERID', data.id)
+          commit('SET_COMPANY', data.company)
           resolve(response)
         }).catch(error => {
           reject(error)

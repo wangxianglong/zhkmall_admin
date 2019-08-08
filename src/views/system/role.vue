@@ -345,11 +345,8 @@ export default {
     },
     handleUpdatePerm() {
       this.permissionForm.permissionIds = this.$refs.tree.getCheckedKeys(true)
-      console.log(this.permissionForm)
-      let params = {
-        permissionIds: this.permissionForm.permissionIds
-      }
-      // params.append('permissionIds', this.permissionForm.permissionIds)
+      let params = new URLSearchParams();
+      params.append('permissionIds', this.permissionForm.permissionIds)
 
       updatePermission(this.permissionForm.roleId, params).then(response => {
         this.permissionDialogFormVisible = false

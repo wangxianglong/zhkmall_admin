@@ -46,9 +46,9 @@
           </template>
         </el-table-column>
         <el-table-column align="center" label="电话" prop="phone" />
-        <el-table-column align="center" label="邮箱" prop="email" />
-        <el-table-column align="center" label="公司" prop="company" />
-        <el-table-column align="center" label="所在地址" prop="address" />
+        <el-table-column align="center" min-width="100" label="邮箱" prop="email" />
+        <el-table-column align="center" min-width="100" label="公司" prop="company" />
+        <el-table-column align="center" min-width="130" label="所在地址" prop="address" />
         <el-table-column align="center" label="头像">
           <template slot-scope="scope">
             <img :src="scope.row.icon" style="width: 50px;border-radius: 50%;" alt="头像" />
@@ -65,11 +65,12 @@
         <el-table-column
           align="center"
           label="操作"
-          width="180"
+          min-width="180"
           class-name="small-padding fixed-width"
         >
           <template slot-scope="{ row }">
             <el-button type="primary" size="mini" @click="handleUpdate(row)">编辑</el-button>
+            <el-button type="success" size="mini" @click="handlePermission(row)">授权</el-button>
             <el-button type="danger" size="mini" @click="handleDelete(row)">删除</el-button>
           </template>
         </el-table-column>
@@ -89,6 +90,7 @@
       ></el-pagination>
     </div>
 
+    <!-- 新建编辑管理员 -->
     <el-dialog :visible.sync="dialogFormVisible" :title="textMap[dialogStatus]">
       <el-form
         ref="dataForm"
@@ -118,6 +120,16 @@
         </el-form-item>
         <el-form-item label="密码：" prop="password">
           <el-input placeholder="请输入密码" v-model="temp.password" show-password></el-input>
+        </el-form-item>
+        <el-form-item label="管理员角色" prop="roleIds" v-if="dialogStatus === 'update'">
+          <el-select v-model="roleIds" multiple placeholder="请选择" style="width: 100%;">
+            <el-option
+              v-for="item in roleOptions"
+              :key="item.id"
+              :label="item.name"
+              :value="item.id"
+            />
+          </el-select>
         </el-form-item>
         <el-form-item label="昵称：" prop="nickName">
           <el-input v-model="temp.nickName" placeholder="请输入昵称" />
@@ -163,11 +175,33 @@
         <el-button type="primary" @click="dialogStatus==='create'?createData():updateData()">确认</el-button>
       </div>
     </el-dialog>
+
+    <!-- 权限配置对话框 -->
+    <el-dialog :visible.sync="permissionDialogFormVisible" title="权限配置">
+      <el-tree
+        ref="tree"
+        :data="systemPermissions"
+        :default-checked-keys="assignedPermissions"
+        show-checkbox
+        node-key="id"
+        highlight-current
+      >
+        <span slot-scope="{ node, data }" class="custom-tree-node">
+          <span>{{ data.name }}</span>
+          <el-tag v-if="data.api" type="success" size="mini">{{ data.api }}</el-tag>
+        </span>
+      </el-tree>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="permissionDialogFormVisible = false">取消</el-button>
+        <el-button type="primary" @click="handleUpdatePerm">确定</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
 <script>
-import { fetchList, fetchDel, fetchEdit, fetchAdd } from '@/api/user'
+import { fetchList, fetchDel, fetchEdit, fetchAdd, getAdminPerm, updAdminPerm, getAdminRole, updAdminRole } from '@/api/user'
+import { getPermissionTree, listRole } from '@/api/role'
 import { resolvingDate } from '@/utils/index'
 import oss from '@/utils/aliOss'
 
@@ -179,7 +213,6 @@ export default {
         return callback(new Error('手机号不能为空'));
       } else {
         const reg = /^1[3|4|5|7|8][0-9]\d{8}$/
-        console.log(reg.test(value));
         if (reg.test(value)) {
           callback();
         } else {
@@ -212,12 +245,21 @@ export default {
         username: ''
       },
       picUrl: [],
+      roleIds: [],
+      roleOptions: [],
       statusDic: ['禁用', '启用'],
       genderMap: { 0: '未知', 1: '男', 3: '女' },
       dialogStatus: '',
       textMap: {
         update: '编辑',
         create: '创建'
+      },
+      permissionDialogFormVisible: false,
+      systemPermissions: null,
+      assignedPermissions: null,
+      permissionForm: {
+        roleId: undefined,
+        permissionIds: []
       },
       rules: {
         username: [{ required: true, message: '请输入用户名', trigger: 'blur' }],
@@ -236,6 +278,8 @@ export default {
   },
   created() {
     this.getList()
+    this.getPermTreeList()
+    this.getRoleOptions()
   },
   methods: {
     getList() {
@@ -249,6 +293,11 @@ export default {
         this.list = data
         this.total = response.data.total
         this.listLoading = false
+      })
+    },
+    getRoleOptions() {
+      listRole({ pageSize: 100 }).then(res => {
+        this.roleOptions = res.data.list
       })
     },
     handleSizeChange(val) {
@@ -293,6 +342,20 @@ export default {
         type: 'error'
       })
     },
+    getAdminRoles(id) {
+      getAdminRole(id).then(res => {
+        let roleArr = []
+        res.data.forEach(item => {
+          roleArr.push(item.id)
+        })
+        this.roleIds = roleArr
+      })
+    },
+    handleUpdAdminRole(id) {
+      let params = new URLSearchParams();
+      params.append('roleIds', this.roleIds)
+      updAdminRole(id, params).then(() => { })
+    },
     resetForm() {
       this.temp = {
         address: '',
@@ -334,6 +397,7 @@ export default {
     },
     handleUpdate(row) {
       this.temp = Object.assign({}, row)
+      this.getAdminRoles(row.id)
       this.dialogStatus = 'update'
       this.temp.password = ''
       var picUrl = []
@@ -347,6 +411,9 @@ export default {
     updateData() {
       this.$refs['dataForm'].validate(valid => {
         if (valid) {
+          if (this.roleIds.length > 0) {
+            this.handleUpdAdminRole(this.temp.id)
+          }
           this.temp.icon = this.picUrl[0].url
           let params = Object.assign({}, this.temp)
           delete params.createTime
@@ -383,6 +450,36 @@ export default {
             type: 'success',
             message: '删除成功!'
           })
+        })
+      })
+    },
+    getPermTreeList() {
+      getPermissionTree().then(response => {
+        this.systemPermissions = response.data
+      })
+    },
+    handlePermission(row) {
+      this.permissionDialogFormVisible = true
+      getAdminPerm(row.id).then(response => {
+        this.assignedPermissions = []
+        let data = response.data
+        data.forEach(item => {
+          this.assignedPermissions.push(item.id)
+        })
+      })
+      this.permissionForm.roleId = row.id
+    },
+    handleUpdatePerm() {
+      this.permissionForm.permissionIds = this.$refs.tree.getCheckedKeys(true)
+      let params = new URLSearchParams();
+      params.append('permissionIds', this.permissionForm.permissionIds)
+
+      updAdminPerm(this.permissionForm.roleId, params).then(response => {
+        this.permissionDialogFormVisible = false
+        this.$notify.success({
+          title: '成功',
+          message: '授权成功',
+          duration: 1500
         })
       })
     }

@@ -4,7 +4,8 @@
     <breadcrumb></breadcrumb>
     <el-dropdown class="avatar-container" trigger="click">
       <div class="avatar-wrapper">
-        <img class="user-avatar" :src="avatar">
+        <img v-if="avatar" :src="avatar" class="user-avatar">
+        <img v-else class="user-avatar" src="http://macro-oss.oss-cn-shenzhen.aliyuncs.com/mall/images/20190129/170157_yIl3_1767531.jpg">
         <i class="el-icon-caret-bottom"></i>
       </div>
       <el-dropdown-menu class="user-dropdown" slot="dropdown">
@@ -13,6 +14,16 @@
             首页
           </el-dropdown-item>
         </router-link>
+        <el-dropdown-item divided>
+            <router-link to="/profile/userCenter">
+              用户中心
+            </router-link>
+          </el-dropdown-item>
+          <el-dropdown-item divided>
+            <router-link to="/profile/password">
+              修改密码
+            </router-link>
+          </el-dropdown-item>
         <el-dropdown-item divided>
           <span @click="logout" style="display:block;">退出</span>
         </el-dropdown-item>
