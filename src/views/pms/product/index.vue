@@ -136,6 +136,7 @@
             ></el-button>
           </template>
         </el-table-column>
+        <el-table-column align="center" width="100" label="库存预警值" prop="lowStock" />
         <el-table-column align="center" width="100" label="销量" prop="sale" />
         <el-table-column label="审核状态" width="100" align="center">
           <template slot-scope="scope">
@@ -153,7 +154,7 @@
             </p>
             <p>
               <el-button size="mini" @click="handleShowLog(scope.$index, scope.row)">日志</el-button>
-              <el-button size="mini" type="danger" @click="handleDelete(scope.$index, scope.row)">删除</el-button>
+              <!-- <el-button size="mini" type="danger" @click="handleDelete(scope.$index, scope.row)">删除</el-button> -->
             </p>
           </template>
         </el-table-column>
@@ -267,6 +268,7 @@ export default {
         productAttr: [],
         keyword: null
       },
+      statusTypeMap: { publishStatus: '上架状态', recommandStatus: '推荐状态', newStatus: '新品状态', deleteStatus: '删除状态' },
       operates: [
         {
           label: "商品上架",
@@ -494,7 +496,6 @@ export default {
         let statusType = this.operateType.statusType
         let status = this.operateType.status
         this.handleEditStatus(ids, statusType, status)
-        // this.getList();
       });
     },
     handleEditStatus(ids, statusType, status) {
@@ -545,42 +546,18 @@ export default {
     handleSelectionChange(val) {
       this.multipleSelection = val;
     },
-
     handleStatusChange(row, statusType) {
-      this.$confirm('是否要进行该操作?', '提示', {
+      this.$confirm(`是否要修改${this.statusTypeMap[statusType]}?`, '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
         let ids = [];
         ids.push(row.id);
-        this.handleEditStatus(ids, statusType, row.publishStatus)
+        this.handleEditStatus(ids, statusType, row[statusType])
+      }).catch(() => {
+        row[statusType] = ~row[statusType] + 2
       })
-    },
-    handleNewStatusChange(index, row) {
-      let ids = [];
-      ids.push(row.id);
-      this.handleEditStatus(ids, 'newStatus', row.newStatus)
-    },
-    handleRecommendStatusChange(index, row) {
-      let ids = [];
-      ids.push(row.id);
-      this.handleEditStatus(ids, 'recommandStatus', row.recommandStatus)
-    },
-    handleResetSearch() {
-      this.selectProductCateValue = [];
-      this.listQuery = Object.assign({}, defaultListQuery);
-    },
-    handleDelete(index, row) {
-      this.$confirm('是否要进行删除操作?', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }).then(() => {
-        let ids = [];
-        ids.push(row.id);
-        this.updateDeleteStatus(1, ids);
-      });
     },
     handleUpdateProduct(index, row) {
       this.$router.push({ path: '/pms/updateProduct', query: { id: row.id } });

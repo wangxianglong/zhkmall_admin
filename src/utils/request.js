@@ -37,7 +37,11 @@ service.interceptors.response.use(
 
       // 401:未登录;
       if (res.code === 401 || res.code === 403) {
-        MessageBox.confirm('您暂无权限，可以取消继续留在该页面，或者重新登录', '确定登出', {
+        let msg = '您暂无权限，可以取消继续留在该页面，或者重新登录'
+        if (res.code === 401) {
+          msg = 'token已失效,请重新登录!'
+        }
+        MessageBox.confirm(msg, '确定登出', {
           confirmButtonText: '重新登录',
           cancelButtonText: '取消',
           type: 'warning'

@@ -70,9 +70,9 @@ export function updAdminRole(id, data) {
 }
 
 // 用户中心
-export function getUser() {
+export function getUser(id) {
   return request({
-    url: '/admin/admin/Center',
+    url: `/admin/admin/Center/${id}`,
     method: 'get'
   })
 }

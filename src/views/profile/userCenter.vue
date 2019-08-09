@@ -66,7 +66,6 @@ export default {
         return callback(new Error('手机号不能为空'));
       } else {
         const reg = /^1[3|4|5|7|8][0-9]\d{8}$/
-        console.log(reg.test(value));
         if (reg.test(value)) {
           callback();
         } else {
@@ -110,9 +109,10 @@ export default {
   },
   methods: {
     getUserProfile() {
-      getUser().then(res => {
-        this.profile = res.data
-        this.picUrl.push({ url: res.data.icon })
+      getUser(this.userid).then(res => {
+        let data = res.data[0]
+        this.profile = data
+        this.picUrl.push({ url: data.icon })
       })
     },
     async fnUploadpicUrl(option) {
@@ -148,7 +148,6 @@ export default {
       this.$refs['dataForm'].validate(valid => {
         if (valid) {
           this.profile.icon = this.picUrl[0] ? this.picUrl[0].url : ''
-          console.log(this.profile)
           fetchEdit(this.userid, this.profile).then(res => {
             this.$notify.success({
               title: '成功',

@@ -66,7 +66,16 @@ export default {
     handleSubmit() {
       this.$refs['dataForm'].validate(valid => {
         if (valid) {
-          updPassword(this.dataForm).then(res => {
+          let params = new URLSearchParams();
+          params.append('password', this.dataForm.password)
+          params.append('new_password', this.dataForm.new_password)
+          params.append('confirm_password', this.dataForm.confirm_password)
+          updPassword(params).then(res => {
+            this.dataForm = {
+              password: '',
+              new_password: '',
+              confirm_password: ''
+            }
             this.$notify.success({
               title: '成功',
               message: '修改成功',
