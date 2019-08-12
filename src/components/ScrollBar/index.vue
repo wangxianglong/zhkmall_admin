@@ -1,7 +1,7 @@
 <template>
-  <div class="scroll-container" ref="scrollContainer" @wheel.prevent="handleScroll" >
-    <div class="scroll-wrapper" ref="scrollWrapper" :style="{top: top + 'px'}">
-      <slot></slot>
+  <div ref="scrollContainer" class="scroll-container" @wheel.prevent="handleScroll">
+    <div ref="scrollWrapper" :style="{top: top + 'px'}" class="scroll-wrapper">
+      <slot />
     </div>
   </div>
 </template>
@@ -10,7 +10,7 @@
 const delta = 15
 
 export default {
-  name: 'scrollBar',
+  name: 'ScrollBar',
   data() {
     return {
       top: 0
@@ -42,7 +42,7 @@ export default {
 </script>
 
 <style rel="stylesheet/scss" lang="scss" scoped>
-@import '../../styles/variables.scss';
+@import "../../styles/variables.scss";
 
 .scroll-container {
   position: relative;
@@ -51,7 +51,7 @@ export default {
   background-color: $menuBg;
   .scroll-wrapper {
     position: absolute;
-     width: 100%!important;
+    width: 100% !important;
   }
 }
 </style>

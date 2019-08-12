@@ -1,38 +1,40 @@
 import axios from 'axios'
 import { Message, MessageBox } from 'element-ui'
-import store from '../store'
+import store from '@/store'
 import { getToken } from '@/utils/auth'
 
-// 创建axios实例
+// create an axios instance
 const service = axios.create({
-  baseURL: process.env.BASE_API, // api的base_url
-  timeout: 15000 // 请求超时时间
+  baseURL: process.env.BASE_API, // api 的 base_url
+  timeout: 15000 // request timeout
 })
 
-// request拦截器
-service.interceptors.request.use(config => {
-  if (store.getters.token) {
-    config.headers['Authorization'] = getToken() // 让每个请求携带自定义token 请根据实际情况自行修改
+// request interceptor
+service.interceptors.request.use(
+  config => {
+    // Do something before request is sent
+    if (store.getters.token) {
+      // 让每个请求携带token-- ['X-Litemall-Admin-Token']为自定义key 请根据实际情况自行修改
+      config.headers['Authorization'] = getToken()
+    }
+    return config
+  },
+  error => {
+    // Do something with request error
+    console.log(error) // for debug
+    Promise.reject(error)
   }
-  return config
-}, error => {
-  // Do something with request error
-  console.log(error) // for debug
-  Promise.reject(error)
-})
+)
 
-// respone拦截器
+// response interceptor
 service.interceptors.response.use(
   response => {
-    /**
-    * code为非200是抛错 可结合自己业务进行修改
-    */
     const res = response.data
     if (res.code !== 200) {
       Message({
         message: res.message,
         type: 'error',
-        duration: 3 * 1000
+        duration: 5 * 1000
       })
 
       // 401:未登录;
@@ -55,16 +57,14 @@ service.interceptors.response.use(
     } else {
       return response.data
     }
-  },
-  error => {
+  }, error => {
     console.log('err' + error)// for debug
     Message({
-      message: error.message,
+      message: '连接超时（后台不能连接，请联系系统管理员）',
       type: 'error',
-      duration: 3 * 1000
+      duration: 5 * 1000
     })
     return Promise.reject(error)
-  }
-)
+  })
 
 export default service

@@ -3,9 +3,9 @@
     <!-- 查询和其他操作 -->
     <el-card class="filter-container" shadow="never">
       <div>
-        <i class="el-icon-search"></i>
+        <i class="el-icon-search" />
         <span>筛选搜索</span>
-        <el-button style="float: right" @click="handleSearchList()" type="primary" size="small">查询结果</el-button>
+        <el-button style="float: right" type="primary" size="small" @click="handleSearchList()">查询结果</el-button>
       </div>
       <div style="margin-top: 15px">
         <el-form :inline="true" :model="listQuery" size="small" label-width="140px">
@@ -21,9 +21,9 @@
       </div>
     </el-card>
     <el-card class="operate-container" shadow="never">
-      <i class="el-icon-tickets"></i>
+      <i class="el-icon-tickets" />
       <span>数据列表</span>
-      <el-button class="btn-add" @click="handleCreate" size="mini">添加</el-button>
+      <el-button class="btn-add" size="mini" @click="handleCreate">添加</el-button>
     </el-card>
 
     <!-- 查询结果 -->
@@ -51,7 +51,7 @@
         <el-table-column align="center" min-width="130" label="所在地址" prop="address" />
         <el-table-column align="center" label="头像">
           <template slot-scope="scope">
-            <img :src="scope.row.icon" style="width: 50px;border-radius: 50%;" alt="头像" />
+            <img :src="scope.row.icon" style="width: 50px;border-radius: 50%;" alt="头像">
           </template>
         </el-table-column>
         <el-table-column align="center" label="状态" width="100" prop="status">
@@ -60,17 +60,17 @@
           </template>
         </el-table-column>
         <el-table-column align="center" label="备注信息" prop="note" />
-        <el-table-column align="center" label="创建时间" min-width="90" prop="createTime" />
-        <el-table-column align="center" label="最后登录时间" min-width="90" prop="loginTime" />
+        <el-table-column align="center" label="创建时间" min-width="100" prop="createTime" />
+        <el-table-column align="center" label="最后登录时间" min-width="100" prop="loginTime" />
         <el-table-column
           align="center"
           label="操作"
-          min-width="180"
+          min-width="130"
           class-name="small-padding fixed-width"
         >
           <template slot-scope="{ row }">
             <el-button type="primary" size="mini" @click="handleUpdate(row)">编辑</el-button>
-            <el-button type="success" size="mini" @click="handlePermission(row)">授权</el-button>
+            <!-- <el-button type="success" size="mini" @click="handlePermission(row)">授权</el-button> -->
             <el-button type="danger" size="mini" @click="handleDelete(row)">删除</el-button>
           </template>
         </el-table-column>
@@ -79,15 +79,15 @@
 
     <div class="pagination-container">
       <el-pagination
-        background
-        @size-change="handleSizeChange"
-        @current-change="handleCurrentChange"
-        layout="total, sizes,prev, pager, next,jumper"
         :page-size="listQuery.pageSize"
         :page-sizes="[5,10,15]"
         :current-page.sync="listQuery.pageNum"
         :total="total"
-      ></el-pagination>
+        background
+        layout="total, sizes, prev, pager, next, jumper"
+        @size-change="handleSizeChange"
+        @current-change="handleCurrentChange"
+      />
     </div>
 
     <!-- 新建编辑管理员 -->
@@ -119,9 +119,9 @@
           <el-input v-model="temp.username" placeholder="请输入用户名" />
         </el-form-item>
         <el-form-item label="密码：" prop="password">
-          <el-input placeholder="请输入密码" v-model="temp.password" show-password></el-input>
+          <el-input v-model="temp.password" placeholder="请输入密码" show-password />
         </el-form-item>
-        <el-form-item label="管理员角色" prop="roleIds" v-if="dialogStatus === 'update'">
+        <el-form-item v-if="dialogStatus === 'update'" label="管理员角色" prop="roleIds">
           <el-select v-model="roleIds" multiple placeholder="请选择" style="width: 100%;">
             <el-option
               v-for="item in roleOptions"
@@ -145,7 +145,7 @@
           </el-select>
         </el-form-item>
         <el-form-item label="电话：" prop="phone">
-          <el-input type="number" v-model="temp.phone" placeholder="请输入电话" />
+          <el-input v-model="temp.phone" type="number" placeholder="请输入电话" />
         </el-form-item>
         <el-form-item label="邮箱：" prop="email">
           <el-input v-model="temp.email" placeholder="请输入邮箱" />
@@ -210,13 +210,13 @@ export default {
   data() {
     var checkPhone = (rule, value, callback) => {
       if (!value) {
-        return callback(new Error('手机号不能为空'));
+        return callback(new Error('手机号不能为空'))
       } else {
         const reg = /^1[3|4|5|7|8][0-9]\d{8}$/
         if (reg.test(value)) {
-          callback();
+          callback()
         } else {
-          return callback(new Error('请输入正确的手机号'));
+          return callback(new Error('请输入正确的手机号'))
         }
       }
     }
@@ -285,7 +285,7 @@ export default {
     getList() {
       this.listLoading = true
       fetchList(this.listQuery).then(response => {
-        let data = response.data.list
+        const data = response.data.list
         data.forEach(item => {
           item.createTime = resolvingDate(item.createTime)
           item.loginTime = resolvingDate(item.loginTime)
@@ -301,13 +301,13 @@ export default {
       })
     },
     handleSizeChange(val) {
-      this.listQuery.pageNum = 1;
-      this.listQuery.pageSize = val;
-      this.getList();
+      this.listQuery.pageNum = 1
+      this.listQuery.pageSize = val
+      this.getList()
     },
     handleCurrentChange(val) {
-      this.listQuery.pageNum = val;
-      this.getList();
+      this.listQuery.pageNum = val
+      this.getList()
     },
     handleSearchList() {
       this.listQuery.pageNum = 1
@@ -344,7 +344,7 @@ export default {
     },
     getAdminRoles(id) {
       getAdminRole(id).then(res => {
-        let roleArr = []
+        const roleArr = []
         res.data.forEach(item => {
           roleArr.push(item.id)
         })
@@ -352,7 +352,7 @@ export default {
       })
     },
     handleUpdAdminRole(id) {
-      let params = new URLSearchParams();
+      const params = new URLSearchParams()
       params.append('roleIds', this.roleIds)
       updAdminRole(id, params).then(() => { })
     },
@@ -415,7 +415,7 @@ export default {
             this.handleUpdAdminRole(this.temp.id)
           }
           this.temp.icon = this.picUrl[0].url
-          let params = Object.assign({}, this.temp)
+          const params = Object.assign({}, this.temp)
           delete params.createTime
           delete params.loginTime
           fetchEdit(this.temp.id, params).then(res => {
@@ -462,7 +462,7 @@ export default {
       this.permissionDialogFormVisible = true
       getAdminPerm(row.id).then(response => {
         this.assignedPermissions = []
-        let data = response.data
+        const data = response.data
         data.forEach(item => {
           this.assignedPermissions.push(item.id)
         })
@@ -471,9 +471,9 @@ export default {
     },
     handleUpdatePerm() {
       this.permissionForm.permissionIds = this.$refs.tree.getCheckedKeys(true)
-      let params = new URLSearchParams();
-      params.append('permissionIds', this.permissionForm.permissionIds)
-
+      const params = new URLSearchParams()
+      params.append('permissionIds', this.permissionForm.permissionIds ? this.permissionForm.permissionIds : [])
+      console.log(this.permissionForm.permissionIds)
       updAdminPerm(this.permissionForm.roleId, params).then(response => {
         this.permissionDialogFormVisible = false
         this.$notify.success({

@@ -1,6 +1,6 @@
 <template>
   <el-card class="form-container" shadow="never">
-    <el-form :model="profile" :rules="rules" ref="dataForm" label-width="150px">
+    <el-form ref="dataForm" :model="profile" :rules="rules" label-width="150px">
       <el-form-item label="头像：">
         <el-upload
           :http-request="fnUploadpicUrl"
@@ -36,7 +36,7 @@
         </el-select>
       </el-form-item>
       <el-form-item label="电话：" prop="phone">
-        <el-input type="number" v-model="profile.phone" placeholder="请输入电话" />
+        <el-input v-model="profile.phone" type="number" placeholder="请输入电话" />
       </el-form-item>
       <el-form-item label="邮箱：" prop="email">
         <el-input v-model="profile.email" placeholder="请输入邮箱" />
@@ -63,13 +63,13 @@ export default {
   data() {
     var checkPhone = (rule, value, callback) => {
       if (!value) {
-        return callback(new Error('手机号不能为空'));
+        return callback(new Error('手机号不能为空'))
       } else {
         const reg = /^1[3|4|5|7|8][0-9]\d{8}$/
         if (reg.test(value)) {
-          callback();
+          callback()
         } else {
-          return callback(new Error('请输入正确的手机号'));
+          return callback(new Error('请输入正确的手机号'))
         }
       }
     }
@@ -110,7 +110,7 @@ export default {
   methods: {
     getUserProfile() {
       getUser(this.userid).then(res => {
-        let data = res.data[0]
+        const data = res.data[0]
         this.profile = data
         this.picUrl.push({ url: data.icon })
       })

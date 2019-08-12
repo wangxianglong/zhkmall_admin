@@ -1,21 +1,37 @@
-
-
 import Vue from 'vue'
-import App from './App'
-import ElementUI from 'element-ui'
+
+import Cookies from 'js-cookie'
+
+import 'normalize.css/normalize.css' // A modern alternative to CSS resets
+
+import Element from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
-import locale from 'element-ui/lib/locale/lang/zh-CN' // lang i18n
-import VCharts from 'v-charts'
-import store from './store'
-import router from './router'
-import 'normalize.css/normalize.css'// A modern alternative to CSS resets
+
 import '@/styles/index.scss' // global css
 
-import '@/icons' // icon
-import '@/permission' // permission control
+import App from './App'
+import router from './router'
+import store from './store'
 
-Vue.use(ElementUI, { locale })
-Vue.use(VCharts)
+import i18n from './lang' // Internationalization
+import './icons' // icon
+import './permission' // permission control
+
+import * as filters from './filters' // global filters
+
+import permission from '@/directive/permission/index.js' // 权限判断指令
+
+Vue.use(Element, {
+  size: Cookies.get('size') || 'medium', // set element-ui default size
+  i18n: (key, value) => i18n.t(key, value)
+})
+
+Vue.directive('permission', permission)
+
+// register global utility filters.
+Object.keys(filters).forEach(key => {
+  Vue.filter(key, filters[key])
+})
 
 Vue.config.productionTip = false
 
@@ -23,6 +39,6 @@ new Vue({
   el: '#app',
   router,
   store,
-  template: '<App/>',
-  components: { App }
+  i18n,
+  render: h => h(App)
 })

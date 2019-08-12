@@ -13,7 +13,7 @@
       <el-form-item label="敬老券领取年龄" prop="oldCouponGetAge">
         <el-input-number v-model="dataForm.oldCouponGetAge" :min="0"/>
       </el-form-item>
-      <el-form-item label="敬老券领取次数" prop="oldCouponGetNum">
+      <el-form-item label="每周领取次数" prop="oldCouponGetNum">
         <el-input-number v-model="dataForm.oldCouponGetNum" :min="0"/>
       </el-form-item>
       <div class="dialog-footer" style="float: right;">

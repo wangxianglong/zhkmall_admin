@@ -22,16 +22,16 @@
       </div>
     </el-card>-->
     <el-card class="operate-container" shadow="never">
-      <i class="el-icon-tickets"></i>
+      <i class="el-icon-tickets" />
       <span>数据列表</span>
-      <el-button class="btn-add" @click="handleCreate" size="mini">添加</el-button>
+      <el-button class="btn-add" size="mini" @click="handleCreate">添加</el-button>
     </el-card>
 
     <!-- 查询结果 -->
     <div class="table-container">
       <el-table
-        ref="relatedData"
         v-loading="listLoading"
+        ref="relatedData"
         :data="list"
         size="small"
         element-loading-text="正在查询中。。。"
@@ -61,20 +61,20 @@
     </div>
 
     <div class="batch-operate-container">
-      <el-button class="search-button" @click="handleBatchOperate()" type="danger" size="small">批量删除</el-button>
+      <el-button class="search-button" type="danger" size="small" @click="handleBatchOperate()">批量删除</el-button>
     </div>
 
     <div class="pagination-container">
       <el-pagination
-        background
-        @size-change="handleSizeChange"
-        @current-change="handleCurrentChange"
-        layout="total, sizes,prev, pager, next,jumper"
         :page-size="listQuery.pageSize"
         :page-sizes="[5,10,15]"
         :current-page.sync="listQuery.pageNum"
         :total="total"
-      ></el-pagination>
+        background
+        layout="total, sizes, prev, pager, next, jumper"
+        @size-change="handleSizeChange"
+        @current-change="handleCurrentChange"
+      />
     </div>
 
     <!-- 添加或修改对话框 -->
@@ -102,7 +102,7 @@
           </el-select>
         </el-form-item>
         <el-form-item label="描述" prop="description">
-          <el-input type="textarea" :rows="2" v-model="dataForm.description" placeholder="请输入描述" />
+          <el-input v-model="dataForm.description" :rows="2" type="textarea" placeholder="请输入描述" />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -136,6 +136,7 @@
 
 <script>
 import { listRole, createRole, updateRole, deleteRole, getPermissionTree, getRolePerm, updatePermission } from '@/api/role'
+import { resolvingDate } from '@/utils/index'
 // import checkPermission from '@/utils/permission' // 权限判断函数
 
 export default {
@@ -185,26 +186,30 @@ export default {
     getList() {
       this.listLoading = true
       listRole(this.listQuery).then(response => {
-        this.list = response.data.list
-        this.total = response.data.total
+        const data = response.data
+        data.list.forEach(item => {
+          item.createTime = resolvingDate(item.createTime)
+        })
+        this.list = data.list
+        this.total = data.total
         this.listLoading = false
       })
     },
     handleSizeChange(val) {
-      this.listQuery.pageNum = 1;
-      this.listQuery.pageSize = val;
-      this.getList();
+      this.listQuery.pageNum = 1
+      this.listQuery.pageSize = val
+      this.getList()
     },
     handleCurrentChange(val) {
-      this.listQuery.pageNum = val;
-      this.getList();
+      this.listQuery.pageNum = val
+      this.getList()
     },
     handleFilter() {
       this.listQuery.pageNum = 1
       this.getList()
     },
     selectRow(val) {
-      this.multipleSelection = val;
+      this.multipleSelection = val
     },
     handleBatchOperate() {
       if (this.multipleSelection == null || this.multipleSelection.length < 1) {
@@ -220,11 +225,11 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        let ids = [];
+        const ids = []
         for (let i = 0; i < this.multipleSelection.length; i++) {
-          ids.push(this.multipleSelection[i].id);
+          ids.push(this.multipleSelection[i].id)
         }
-        let params = new URLSearchParams();
+        const params = new URLSearchParams()
         params.append('ids', ids)
         deleteRole(params).then(response => {
           for (let i = 0; i < this.multipleSelection.length; i++) {
@@ -315,7 +320,7 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        let params = new URLSearchParams();
+        const params = new URLSearchParams()
         params.append('ids', [row.id])
         deleteRole(params).then(response => {
           this.list.splice(index, 1)
@@ -336,7 +341,7 @@ export default {
       this.permissionDialogFormVisible = true
       getRolePerm(row.id).then(response => {
         this.assignedPermissions = []
-        let data = response.data
+        const data = response.data
         data.forEach(item => {
           this.assignedPermissions.push(item.id)
         })
@@ -345,7 +350,7 @@ export default {
     },
     handleUpdatePerm() {
       this.permissionForm.permissionIds = this.$refs.tree.getCheckedKeys(true)
-      let params = new URLSearchParams();
+      const params = new URLSearchParams()
       params.append('permissionIds', this.permissionForm.permissionIds)
 
       updatePermission(this.permissionForm.roleId, params).then(response => {

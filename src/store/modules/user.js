@@ -1,4 +1,4 @@
-import { login, logout, getInfo } from '@/api/login'
+import { loginByUsername, logout, getUserInfo } from '@/api/login'
 import { getToken, setToken, removeToken } from '@/utils/auth'
 
 const user = {
@@ -33,11 +33,11 @@ const user = {
   },
 
   actions: {
-    // 登录
-    Login({ commit }, userInfo) {
+    // 用户名登录
+    LoginByUsername({ commit }, userInfo) {
       const username = userInfo.username.trim()
       return new Promise((resolve, reject) => {
-        login(username, userInfo.password).then(response => {
+        loginByUsername(username, userInfo.password).then(response => {
           const data = response.data
           const tokenStr = `${data.tokenHead} ${data.token}`
           commit('SET_TOKEN', tokenStr)
@@ -50,9 +50,9 @@ const user = {
     },
 
     // 获取用户信息
-    GetInfo({ commit, state }) {
+    GetUserInfo({ commit, state }) {
       return new Promise((resolve, reject) => {
-        getInfo().then(response => {
+        getUserInfo().then(response => {
           const data = response.data
           if (data.roles && data.roles.length > 0) { // 验证返回的roles是否是一个非空数组
             commit('SET_ROLES', data.roles)
@@ -70,12 +70,27 @@ const user = {
       })
     },
 
+    // 第三方验证登录
+    // LoginByThirdparty({ commit, state }, code) {
+    //   return new Promise((resolve, reject) => {
+    //     commit('SET_CODE', code)
+    //     loginByThirdparty(state.status, state.email, state.code).then(response => {
+    //       commit('SET_TOKEN', response.data.token)
+    //       setToken(response.data.token)
+    //       resolve()
+    //     }).catch(error => {
+    //       reject(error)
+    //     })
+    //   })
+    // },
+
     // 登出
     LogOut({ commit, state }) {
       return new Promise((resolve, reject) => {
         logout(state.token).then(() => {
           commit('SET_TOKEN', '')
           commit('SET_ROLES', [])
+          commit('SET_PERMS', [])
           removeToken()
           resolve()
         }).catch(error => {
@@ -90,6 +105,25 @@ const user = {
         commit('SET_TOKEN', '')
         removeToken()
         resolve()
+      })
+    },
+
+    // 动态修改权限
+    ChangeRoles({ commit, dispatch }, role) {
+      return new Promise(resolve => {
+        commit('SET_TOKEN', role)
+        setToken(role)
+        getUserInfo(role).then(response => {
+          const data = response.data
+          commit('SET_ROLES', data.roles)
+          commit('SET_PERMS', data.perms)
+          commit('SET_NAME', data.name)
+          commit('SET_AVATAR', data.avatar)
+          commit('SET_CODE', data.number)
+          commit('SET_INTRODUCTION', data.introduction)
+          dispatch('GenerateRoutes', data) // 动态修改权限后 重绘侧边菜单
+          resolve()
+        })
       })
     }
   }

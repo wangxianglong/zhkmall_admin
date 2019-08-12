@@ -1,116 +1,96 @@
 <template>
   <div class="upload-container">
-    <el-button icon='el-icon-upload' size="mini" :style="{background:color,borderColor:color}"
-               @click=" dialogVisible=true" type="primary">上传图片
-    </el-button>
-    <el-dialog append-to-body :visible.sync="dialogVisible">
-      <el-upload class="editor-slide-upload"
-                 action="http://macro-oss.oss-cn-shenzhen.aliyuncs.com"
-                 :data="dataObj"
-                 :multiple="true"
-                 :file-list="fileList"
-                 :show-file-list="true"
-                 list-type="picture-card"
-                 :on-remove="handleRemove"
-                 :on-success="handleSuccess"
-                 :before-upload="beforeUpload">
-        <el-button size="small" type="primary">点击上传</el-button>
+    <el-button
+      :style="{background:color,borderColor:color}"
+      icon="el-icon-upload"
+      size="mini"
+      type="primary"
+      @click=" dialogVisible=true"
+    >上传图片</el-button>
+    <el-dialog :visible.sync="dialogVisible" append-to-body>
+      <el-upload
+        :http-request="fnUploadRequest"
+        :show-file-list="true"
+        :file-list="fileList"
+        :limit="5"
+        :on-remove="handleRemove"
+        :on-exceed="beyondFile"
+        action
+        list-type="picture-card"
+      >
+        <i class="el-icon-plus"/>
       </el-upload>
-      <el-button @click="dialogVisible = false">取 消</el-button>
-      <el-button type="primary" @click="handleSubmit">确 定</el-button>
+      <el-row style="margin-top: 20px;">
+        <el-button @click="dialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="handleSubmit">确 定</el-button>
+      </el-row>
     </el-dialog>
   </div>
 </template>
 
 <script>
-  import {policy} from '@/api/oss'
+import oss from '@/utils/aliOss'
 
-  export default {
-    name: 'editorSlideUpload',
-    props: {
-      color: {
-        type: String,
-        default: '#1890ff'
-      }
+export default {
+  name: 'SlideUpload',
+  props: {
+    color: {
+      type: String,
+      default: '#1890ff'
+    }
+  },
+  data() {
+    return {
+      dialogVisible: false,
+      fileList: []
+    }
+  },
+  methods: {
+    handleSubmit() {
+      this.$emit('successCBK', this.fileList)
+      this.fileList = []
+      this.dialogVisible = false
     },
-    data() {
-      return {
-        dialogVisible: false,
-        listObj: {},
-        fileList: [],
-        dataObj: {
-          policy: '',
-          signature: '',
-          key: '',
-          ossaccessKeyId: '',
-          dir: '',
-          host: ''
-        }
-      }
+    // 上传
+    async fnUploadRequest(option) {
+      oss.ossUploadFile(option).then(res => {
+        this.fileList.push({ url: res.fileUrl })
+      })
     },
-    methods: {
-      checkAllSuccess() {
-        return Object.keys(this.listObj).every(item => this.listObj[item].hasSuccess)
-      },
-      handleSubmit() {
-        const arr = Object.keys(this.listObj).map(v => this.listObj[v])
-        if (!this.checkAllSuccess()) {
-          this.$message('请等待所有图片上传成功 或 出现了网络问题，请刷新页面重新上传！')
-          return
-        }
-        console.log(arr);
-        this.$emit('successCBK', arr);
-        this.listObj = {};
-        this.fileList = [];
-        this.dialogVisible = false;
-      },
-      handleSuccess(response, file) {
-        const uid = file.uid;
-        const objKeyArr = Object.keys(this.listObj)
-        for (let i = 0, len = objKeyArr.length; i < len; i++) {
-          if (this.listObj[objKeyArr[i]].uid === uid) {
-            this.listObj[objKeyArr[i]].url = this.dataObj.host + '/' + this.dataObj.dir + '/' + file.name;
-            this.listObj[objKeyArr[i]].hasSuccess = true;
-            return
-          }
-        }
-      },
-      handleRemove(file) {
-        const uid = file.uid;
-        const objKeyArr = Object.keys(this.listObj);
-        for (let i = 0, len = objKeyArr.length; i < len; i++) {
-          if (this.listObj[objKeyArr[i]].uid === uid) {
-            delete this.listObj[objKeyArr[i]];
-            return
-          }
-        }
-      },
-      beforeUpload(file) {
-        const _self = this
-        const fileName = file.uid;
-        this.listObj[fileName] = {};
-        return new Promise((resolve, reject) => {
-          policy().then(response => {
-            _self.dataObj.policy = response.data.policy;
-            _self.dataObj.signature = response.data.signature;
-            _self.dataObj.ossaccessKeyId = response.data.accessKeyId;
-            _self.dataObj.key = response.data.dir + '/${filename}';
-            _self.dataObj.dir = response.data.dir;
-            _self.dataObj.host = response.data.host;
-            _self.listObj[fileName] = {hasSuccess: false, uid: file.uid, width: this.width, height: this.height};
-            resolve(true)
-          }).catch(err => {
-            console.log(err)
-            reject(false)
-          })
-        })
+    beforeAvatarUpload(file) {
+      let isIMAGE = false
+      if (
+        file.type === 'image/jpeg' ||
+        file.type === 'image/gif' ||
+        file.type === 'image/png'
+      ) {
+        isIMAGE = true
       }
+      if (!isIMAGE) {
+        this.$message.error('上传文件只能是图片格式!')
+      }
+      return isIMAGE
+    },
+    // 删除图片
+    handleRemove(file, fileList) {
+      this.fileList = fileList
+    },
+    // 添加多个文件事件
+    beyondFile(files, fileList) {
+      this.$message({
+        message: '最多上传' + fileList.length + '张图片',
+        type: 'error'
+      })
     }
   }
+}
 </script>
 
 <style rel="stylesheet/scss" lang="scss" scoped>
-  .upload-container .editor-slide-upload{
-    margin-bottom: 20px;
+.editor-slide-upload {
+  margin-bottom: 20px;
+  /deep/ .el-upload--picture-card {
+    width: 100%;
   }
+}
 </style>

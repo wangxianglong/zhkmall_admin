@@ -17,33 +17,33 @@
 </template>
 
 <script>
-  import img_404 from '@/assets/images/gif_404.gif';
+import img_404 from '@/assets/images/gif_404.gif'
 
-  export default {
-    name: 'wrongPage',
-    data() {
-      return {
-        img_404
-      }
-    },
-    methods: {
-      handleGoMain() {
-        this.$router.push({path: '/'})
-      }
-    },
+export default {
+  name: 'WrongPage',
+  data() {
+    return {
+      img_404
+    }
+  },
+  methods: {
+    handleGoMain() {
+      this.$router.push({ path: '/' })
+    }
   }
+}
 </script>
 
 <style scoped>
-  .app-container {
-    width: 80%;
-    margin: 120px auto;
-  }
+.app-container {
+  width: 80%;
+  margin: 120px auto;
+}
 
-  .img-style {
-    width: auto;
-    height: auto;
-    max-width: 100%;
-    max-height: 100%;
-  }
+.img-style {
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: 100%;
+}
 </style>

@@ -1,6 +1,6 @@
 <template>
   <el-card class="form-container" shadow="never">
-    <el-form :model="dataForm" :rules="rules" ref="dataForm" label-width="150px">
+    <el-form ref="dataForm" :model="dataForm" :rules="rules" label-width="150px">
       <el-form-item label="公司：">
         <span v-if="company">{{ company }}</span>
         <span v-else>暂无</span>
@@ -66,7 +66,7 @@ export default {
     handleSubmit() {
       this.$refs['dataForm'].validate(valid => {
         if (valid) {
-          let params = new URLSearchParams();
+          const params = new URLSearchParams()
           params.append('password', this.dataForm.password)
           params.append('new_password', this.dataForm.new_password)
           params.append('confirm_password', this.dataForm.confirm_password)

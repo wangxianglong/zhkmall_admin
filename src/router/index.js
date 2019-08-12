@@ -19,8 +19,8 @@ import Layout from '../views/layout/Layout'
   }
  **/
 export const constantRouterMap = [
-  {path: '/login', component: () => import('@/views/login/index'), hidden: true},
-  {path: '/404', component: () => import('@/views/404'), hidden: true},
+  { path: '/login', component: () => import('@/views/login/index'), hidden: true },
+  { path: '/404', component: () => import('@/views/404'), hidden: true },
   {
     path: '',
     component: Layout,
@@ -29,7 +29,7 @@ export const constantRouterMap = [
       path: 'home',
       name: 'home',
       component: () => import('@/views/home/index'),
-      meta: {title: '首页', icon: 'home'}
+      meta: { title: '首页', icon: 'home' }
     }]
   },
   // {
@@ -81,107 +81,107 @@ export const constantRouterMap = [
     component: Layout,
     redirect: '/pms/product',
     name: 'pms',
-    meta: {title: '商品管理', icon: 'product'},
+    meta: { title: '商品管理', icon: 'product' },
     children: [{
       path: 'product',
       name: 'product',
       component: () => import('@/views/pms/product/index'),
-      meta: {title: '商品列表', icon: 'product-list'}
+      meta: { title: '商品列表', icon: 'product-list' }
     },
-      {
-        path: 'addProduct',
-        name: 'addProduct',
-        component: () => import('@/views/pms/product/add'),
-        meta: {title: '添加商品', icon: 'product-add'}
-      },
-      {
-        path: 'updateProduct',
-        name: 'updateProduct',
-        component: () => import('@/views/pms/product/update'),
-        meta: {title: '修改商品', icon: 'product-add'},
-        hidden: true
-      },
-      {
-        path: 'productRecycle',
-        name: 'productRecycle',
-        component: () => import('@/views/pms/product/index'),
-        meta: {title: '商品回收站', icon: 'product-recycle'},
-        hidden: true
-      },
-      {
-        path: 'productComment',
-        name: 'productComment',
-        component: () => import('@/views/pms/product/index'),
-        meta: {title: '商品评价', icon: 'product-comment'},
-        hidden: true
-      },
-      {
-        path: 'productCate',
-        name: 'productCate',
-        component: () => import('@/views/pms/productCate/index'),
-        meta: {title: '商品分类', icon: 'product-cate'}
-      },
-      {
-        path: 'addProductCate',
-        name: 'addProductCate',
-        component: () => import('@/views/pms/productCate/add'),
-        meta: {title: '添加商品分类'},
-        hidden: true
-      },
-      {
-        path: 'updateProductCate',
-        name: 'updateProductCate',
-        component: () => import('@/views/pms/productCate/update'),
-        meta: {title: '修改商品分类'},
-        hidden: true
-      },
-      {
-        path: 'productAttr',
-        name: 'productAttr',
-        component: () => import('@/views/pms/productAttr/index'),
-        meta: {title: '商品类型', icon: 'product-attr'}
-      },
-      {
-        path: 'productAttrList',
-        name: 'productAttrList',
-        component: () => import('@/views/pms/productAttr/productAttrList'),
-        meta: {title: '商品属性列表'},
-        hidden: true
-      },
-      {
-        path: 'addProductAttr',
-        name: 'addProductAttr',
-        component: () => import('@/views/pms/productAttr/addProductAttr'),
-        meta: {title: '添加商品属性'},
-        hidden: true
-      },
-      {
-        path: 'updateProductAttr',
-        name: 'updateProductAttr',
-        component: () => import('@/views/pms/productAttr/updateProductAttr'),
-        meta: {title: '修改商品属性'},
-        hidden: true
-      },
-      {
-        path: 'brand',
-        name: 'brand',
-        component: () => import('@/views/pms/brand/index'),
-        meta: {title: '品牌管理', icon: 'product-brand'}
-      },
-      {
-        path: 'addBrand',
-        name: 'addBrand',
-        component: () => import('@/views/pms/brand/add'),
-        meta: {title: '添加品牌'},
-        hidden: true
-      },
-      {
-        path: 'updateBrand',
-        name: 'updateBrand',
-        component: () => import('@/views/pms/brand/update'),
-        meta: {title: '编辑品牌'},
-        hidden: true
-      }
+    {
+      path: 'addProduct',
+      name: 'addProduct',
+      component: () => import('@/views/pms/product/add'),
+      meta: { title: '添加商品', icon: 'product-add' }
+    },
+    {
+      path: 'updateProduct',
+      name: 'updateProduct',
+      component: () => import('@/views/pms/product/update'),
+      meta: { title: '修改商品', icon: 'product-add' },
+      hidden: true
+    },
+    {
+      path: 'productRecycle',
+      name: 'productRecycle',
+      component: () => import('@/views/pms/product/index'),
+      meta: { title: '商品回收站', icon: 'product-recycle' },
+      hidden: true
+    },
+    {
+      path: 'productComment',
+      name: 'productComment',
+      component: () => import('@/views/pms/product/index'),
+      meta: { title: '商品评价', icon: 'product-comment' },
+      hidden: true
+    },
+    {
+      path: 'productCate',
+      name: 'productCate',
+      component: () => import('@/views/pms/productCate/index'),
+      meta: { title: '商品分类', icon: 'product-cate' }
+    },
+    {
+      path: 'addProductCate',
+      name: 'addProductCate',
+      component: () => import('@/views/pms/productCate/add'),
+      meta: { title: '添加商品分类' },
+      hidden: true
+    },
+    {
+      path: 'updateProductCate',
+      name: 'updateProductCate',
+      component: () => import('@/views/pms/productCate/update'),
+      meta: { title: '修改商品分类' },
+      hidden: true
+    },
+    {
+      path: 'productAttr',
+      name: 'productAttr',
+      component: () => import('@/views/pms/productAttr/index'),
+      meta: { title: '商品类型', icon: 'product-attr' }
+    },
+    {
+      path: 'productAttrList',
+      name: 'productAttrList',
+      component: () => import('@/views/pms/productAttr/productAttrList'),
+      meta: { title: '商品属性列表' },
+      hidden: true
+    },
+    {
+      path: 'addProductAttr',
+      name: 'addProductAttr',
+      component: () => import('@/views/pms/productAttr/addProductAttr'),
+      meta: { title: '添加商品属性' },
+      hidden: true
+    },
+    {
+      path: 'updateProductAttr',
+      name: 'updateProductAttr',
+      component: () => import('@/views/pms/productAttr/updateProductAttr'),
+      meta: { title: '修改商品属性' },
+      hidden: true
+    },
+    {
+      path: 'brand',
+      name: 'brand',
+      component: () => import('@/views/pms/brand/index'),
+      meta: { title: '品牌管理', icon: 'product-brand' }
+    },
+    {
+      path: 'addBrand',
+      name: 'addBrand',
+      component: () => import('@/views/pms/brand/add'),
+      meta: { title: '添加品牌' },
+      hidden: true
+    },
+    {
+      path: 'updateBrand',
+      name: 'updateBrand',
+      component: () => import('@/views/pms/brand/update'),
+      meta: { title: '编辑品牌' },
+      hidden: true
+    }
     ]
   },
   {
@@ -189,52 +189,52 @@ export const constantRouterMap = [
     component: Layout,
     redirect: '/oms/order',
     name: 'oms',
-    meta: {title: '订单管理', icon: 'order'},
+    meta: { title: '订单管理', icon: 'order' },
     children: [
       {
         path: 'order',
         name: 'order',
         component: () => import('@/views/oms/order/index'),
-        meta: {title: '订单列表', icon: 'product-list'}
+        meta: { title: '订单列表', icon: 'product-list' }
       },
       {
         path: 'orderDetail',
         name: 'orderDetail',
         component: () => import('@/views/oms/order/orderDetail'),
-        meta: {title: '订单详情'},
-        hidden:true
+        meta: { title: '订单详情' },
+        hidden: true
       },
       {
         path: 'deliverOrderList',
         name: 'deliverOrderList',
         component: () => import('@/views/oms/order/deliverOrderList'),
-        meta: {title: '发货列表'},
-        hidden:true
+        meta: { title: '发货列表' },
+        hidden: true
       },
       {
         path: 'orderSetting',
         name: 'orderSetting',
         component: () => import('@/views/oms/order/setting'),
-        meta: {title: '订单设置', icon: 'order-setting'}
+        meta: { title: '订单设置', icon: 'order-setting' }
       },
       {
         path: 'returnApply',
         name: 'returnApply',
         component: () => import('@/views/oms/apply/index'),
-        meta: {title: '退货申请处理', icon: 'order-return'}
+        meta: { title: '退货申请处理', icon: 'order-return' }
       },
       {
         path: 'returnReason',
         name: 'returnReason',
         component: () => import('@/views/oms/apply/reason'),
-        meta: {title: '退货原因设置', icon: 'order-return-reason'}
+        meta: { title: '退货原因设置', icon: 'order-return-reason' }
       },
       {
         path: 'returnApplyDetail',
         name: 'returnApplyDetail',
         component: () => import('@/views/oms/apply/applyDetail'),
-        meta: {title: '退货原因详情'},
-        hidden:true
+        meta: { title: '退货原因详情' },
+        hidden: true
       }
     ]
   },
@@ -390,20 +390,20 @@ export const constantRouterMap = [
         path: 'freightSet',
         name: 'freightSet',
         component: () => import('@/views/platform/freightSet/index'),
-        meta: {title: '运费配置', icon: 'sms-coupon'}
+        meta: { title: '运费配置', icon: 'sms-coupon' }
       },
       {
         path: 'addFreightSet',
         name: 'addFreightSet',
         component: () => import('@/views/platform/freightSet/add'),
-        meta: {title: '添加运费配置'},
+        meta: { title: '添加运费配置' },
         hidden: true
       },
       {
         path: 'updateFreightSet',
         name: 'updateFreightSet',
         component: () => import('@/views/platform/freightSet/update'),
-        meta: {title: '修改运费配置'},
+        meta: { title: '修改运费配置' },
         hidden: true
       },
       {
@@ -451,12 +451,12 @@ export const constantRouterMap = [
       }
     ]
   },
-  {path: '*', redirect: '/404', hidden: true}
+  { path: '*', redirect: '/404', hidden: true }
 ]
 
 export default new Router({
   // mode: 'history', //后端支持可开
-  scrollBehavior: () => ({y: 0}),
+  scrollBehavior: () => ({ y: 0 }),
   routes: constantRouterMap
 })
 

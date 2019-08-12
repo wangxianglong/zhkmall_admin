@@ -1,31 +1,29 @@
 <template>
   <el-menu class="navbar" mode="horizontal">
-    <hamburger class="hamburger-container" :toggleClick="toggleSideBar" :isActive="sidebar.opened"></hamburger>
-    <breadcrumb></breadcrumb>
+    <hamburger :toggle-click="toggleSideBar" :is-active="sidebar.opened" class="hamburger-container" />
+    <breadcrumb />
     <el-dropdown class="avatar-container" trigger="click">
       <div class="avatar-wrapper">
         <img v-if="avatar" :src="avatar" class="user-avatar">
-        <img v-else class="user-avatar" src="http://macro-oss.oss-cn-shenzhen.aliyuncs.com/mall/images/20190129/170157_yIl3_1767531.jpg">
-        <i class="el-icon-caret-bottom"></i>
+        <img
+          v-else
+          class="user-avatar"
+          src="http://macro-oss.oss-cn-shenzhen.aliyuncs.com/mall/images/20190129/170157_yIl3_1767531.jpg"
+        >
+        <i class="el-icon-caret-bottom" />
       </div>
-      <el-dropdown-menu class="user-dropdown" slot="dropdown">
+      <el-dropdown-menu slot="dropdown" class="user-dropdown">
         <router-link class="inlineBlock" to="/">
-          <el-dropdown-item>
-            首页
-          </el-dropdown-item>
+          <el-dropdown-item>首页</el-dropdown-item>
         </router-link>
         <el-dropdown-item divided>
-            <router-link to="/profile/userCenter">
-              用户中心
-            </router-link>
-          </el-dropdown-item>
-          <el-dropdown-item divided>
-            <router-link to="/profile/password">
-              修改密码
-            </router-link>
-          </el-dropdown-item>
+          <router-link to="/profile/userCenter">用户中心</router-link>
+        </el-dropdown-item>
         <el-dropdown-item divided>
-          <span @click="logout" style="display:block;">退出</span>
+          <router-link to="/profile/password">修改密码</router-link>
+        </el-dropdown-item>
+        <el-dropdown-item divided>
+          <span style="display:block;" @click="logout">退出</span>
         </el-dropdown-item>
       </el-dropdown-menu>
     </el-dropdown>

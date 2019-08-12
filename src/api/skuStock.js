@@ -1,16 +1,16 @@
 import request from '@/utils/request'
-export function fetchList(pid,params) {
+export function fetchList(pid, params) {
   return request({
-    url:'/sku/'+pid,
-    method:'get',
-    params:params
+    url: '/sku/' + pid,
+    method: 'get',
+    params: params
   })
 }
 
-export function update(pid,data) {
+export function update(pid, data) {
   return request({
-    url:'/sku/update/'+pid,
-    method:'post',
-    data:data
+    url: '/sku/update/' + pid,
+    method: 'post',
+    data: data
   })
 }
