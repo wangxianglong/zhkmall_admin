@@ -11,7 +11,7 @@ const ScriptExtHtmlWebpackPlugin = require('script-ext-html-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin')
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
-const VueLoaderPlugin = require('vue-loader/lib/plugin')
+// const VueLoaderPlugin = require('vue-loader/lib/plugin')
 
 function resolve(dir) {
   return path.join(__dirname, '..', dir)
@@ -43,10 +43,11 @@ const webpackConfig = merge(baseWebpackConfig, {
     new webpack.DefinePlugin({
       'process.env': env
     }),
-    new VueLoaderPlugin(),
+    // new VueLoaderPlugin(),
     // extract css into its own file
     new MiniCssExtractPlugin({
-      filename: 'css/main.css',
+      filename: utils.assetsPath('css/[name].[contenthash:8].css'),
+      chunkFilename: utils.assetsPath('css/[name].[contenthash:8].css')
     }),
 
     // Compress extracted CSS. We are using this plugin so that possible
@@ -112,9 +113,8 @@ const webpackConfig = merge(baseWebpackConfig, {
     ])
   ],
   optimization: {
-    sideEffects: true,
     splitChunks: {
-      // chunks: 'all',
+      chunks: 'all',
       cacheGroups: {
         libs: {
           name: 'chunk-libs',
@@ -127,26 +127,12 @@ const webpackConfig = merge(baseWebpackConfig, {
           priority: 20, // 权重要大于 libs 和 app 不然会被打包进 libs 或者 app
           test: /[\\/]node_modules[\\/]element-ui[\\/]/
         },
-        // commons: {
-        //   name: 'chunk-commons',
-        //   test: resolve('src/components'), // 可自定义拓展你的规则
-        //   minChunks: 3, // 最小公用次数
-        //   priority: 5,
-        //   reuseExistingChunk: true
-        // }
-        vendor: {
-          test: '/node_modules',
-          chunks: 'initial',
-          name: 'vendor',
-          priority: 10,
-          enforce: true
-        },
         commons: {
-          name: "commons",
-          chunks: "initial",
-          minChunks: 2,
-          maxInitialRequests: 5,
-          minSize: 0
+          name: 'chunk-commons',
+          test: resolve('src/components'), // 可自定义拓展你的规则
+          minChunks: 3, // 最小公用次数
+          priority: 5,
+          reuseExistingChunk: true
         }
       }
     },
@@ -154,17 +140,17 @@ const webpackConfig = merge(baseWebpackConfig, {
     minimizer: [
       new UglifyJsPlugin({
         uglifyOptions: {
-          //     mangle: {
-          //       safari10: true
-          //     }
-          compress: false
+          mangle: {
+            safari10: true
+          }
         },
-        //   sourceMap: config.build.productionSourceMap,
-        //   cache: true,
-        //   parallel: true
+        sourceMap: config.build.productionSourceMap,
+        cache: true,
+        parallel: true
       }),
       // Compress extracted CSS. We are using this plugin so that possible
       // duplicated CSS from different components can be deduped.
+      new OptimizeCSSAssetsPlugin()
     ]
   }
 })
