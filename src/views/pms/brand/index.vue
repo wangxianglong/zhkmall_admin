@@ -2,63 +2,54 @@
   <div class="app-container">
     <el-card class="filter-container" shadow="never">
       <div>
-        <i class="el-icon-search"></i>
+        <i class="el-icon-search" />
         <span>筛选搜索</span>
-        <el-button style="float: right" @click="searchBrandList()" type="primary" size="small">查询结果</el-button>
+        <el-button style="float: right" type="primary" size="small" @click="searchBrandList()">查询结果</el-button>
       </div>
       <div style="margin-top: 15px">
         <el-form :inline="true" :model="listQuery" size="small" label-width="140px">
           <el-form-item label="输入搜索：">
-            <el-input style="width: 203px" v-model="listQuery.keyword" placeholder="品牌名称/关键字"></el-input>
+            <el-input v-model="listQuery.keyword" placeholder="品牌名称/关键字" style="width: 203px" />
           </el-form-item>
         </el-form>
       </div>
     </el-card>
     <el-card class="operate-container" shadow="never">
-      <i class="el-icon-tickets"></i>
+      <i class="el-icon-tickets" />
       <span>数据列表</span>
-      <el-button class="btn-add" @click="addBrand()" size="mini">添加</el-button>
+      <el-button class="btn-add" size="mini" @click="addBrand()">添加</el-button>
     </el-card>
     <div class="table-container">
       <el-table
+        v-loading="listLoading"
         ref="brandTable"
         :data="list"
         style="width: 100%"
-        @selection-change="handleSelectionChange"
-        v-loading="listLoading"
         border
+        @selection-change="handleSelectionChange"
       >
-        <el-table-column type="selection" width="60" align="center"></el-table-column>
-        <el-table-column label="编号" width="100" align="center">
-          <template slot-scope="scope">{{scope.row.id}}</template>
-        </el-table-column>
-        <el-table-column label="品牌名称" align="center">
-          <template slot-scope="scope">{{scope.row.name}}</template>
-        </el-table-column>
-        <el-table-column label="品牌首字母" width="100" align="center">
-          <template slot-scope="scope">{{scope.row.firstLetter}}</template>
-        </el-table-column>
-        <el-table-column label="排序" width="100" align="center">
-          <template slot-scope="scope">{{scope.row.sort}}</template>
-        </el-table-column>
+        <el-table-column type="selection" width="60" align="center" />
+        <el-table-column label="排序" width="100" align="center" prop="sort" />
+        <el-table-column label="品牌名称" width="100" align="center" prop="name" />
+        <el-table-column label="品牌首字母" width="100" align="center" prop="firstLetter" />
         <el-table-column label="品牌制造商" width="100" align="center">
           <template slot-scope="scope">
             <el-switch
-              @change="handleFactoryStatusChange(scope.$index, scope.row)"
               :active-value="1"
               :inactive-value="0"
               v-model="scope.row.factoryStatus"
-            ></el-switch>
+              @change="handleFactoryStatusChange(scope.$index, scope.row)"
+            />
           </template>
         </el-table-column>
         <el-table-column label="是否显示" width="100" align="center">
           <template slot-scope="scope">
             <el-switch
-              @change="handleShowStatusChange(scope.$index, scope.row)"
               :active-value="1"
               :inactive-value="0"
               v-model="scope.row.showStatus"
-            ></el-switch>
+              @change="handleShowStatusChange(scope.$index, scope.row)"
+            />
           </template>
         </el-table-column>
         <el-table-column label="相关" width="220" align="center">
@@ -75,58 +66,58 @@
         </el-table-column>
         <el-table-column label="操作" width="200" align="center">
           <template slot-scope="scope">
-            <el-button size="mini" @click="handleUpdate(scope.$index, scope.row)">编辑</el-button>
+            <el-button size="mini" type="primary" @click="handleUpdate(scope.$index, scope.row)">编辑</el-button>
             <el-button size="mini" type="danger" @click="handleDelete(scope.$index, scope.row)">删除</el-button>
           </template>
         </el-table-column>
       </el-table>
     </div>
     <div class="batch-operate-container">
-      <el-select size="small" v-model="operateType" placeholder="批量操作">
+      <el-select v-model="operateType" size="small" placeholder="批量操作">
         <el-option
           v-for="item in operates"
           :key="item.value"
           :label="item.label"
           :value="item.value"
-        ></el-option>
+        />
       </el-select>
       <el-button
         style="margin-left: 20px"
         class="search-button"
-        @click="handleBatchOperate()"
         type="primary"
         size="small"
+        @click="handleBatchOperate()"
       >确定</el-button>
     </div>
     <div class="pagination-container">
       <el-pagination
-        background
-        @size-change="handleSizeChange"
-        @current-change="handleCurrentChange"
-        layout="total, sizes,prev, pager, next,jumper"
         :page-size="listQuery.pageSize"
         :page-sizes="[5,10,15]"
         :current-page.sync="listQuery.pageNum"
         :total="total"
-      ></el-pagination>
+        background
+        layout="total, sizes, prev, pager, next, jumper"
+        @size-change="handleSizeChange"
+        @current-change="handleCurrentChange"
+      />
     </div>
   </div>
 </template>
 <script>
-import { fetchList, updateShowStatus, updateFactoryStatus, deleteBrand } from '@/api/brand'
+import { brandList, updateShowStatus, updateFactoryStatus, deleteBrand } from '@/api/brand'
 
 export default {
-  name: 'brandList',
+  name: 'BrandList',
   data() {
     return {
       operates: [
         {
-          label: "显示品牌",
-          value: "showBrand"
+          label: '显示品牌',
+          value: 'showBrand'
         },
         {
-          label: "隐藏品牌",
-          value: "hideBrand"
+          label: '隐藏品牌',
+          value: 'hideBrand'
         }
       ],
       operateType: null,
@@ -142,24 +133,24 @@ export default {
     }
   },
   created() {
-    this.getList();
+    this.getList()
   },
   methods: {
     getList() {
-      this.listLoading = true;
-      fetchList(this.listQuery).then(response => {
-        this.listLoading = false;
-        this.list = response.data.list;
-        this.total = response.data.total;
-        this.totalPage = response.data.totalPage;
-        this.pageSize = response.data.pageSize;
-      });
+      this.listLoading = true
+      brandList(this.listQuery).then(response => {
+        this.listLoading = false
+        this.list = response.data.list
+        this.total = response.data.total
+        this.totalPage = response.data.totalPage
+        this.pageSize = response.data.pageSize
+      })
     },
     handleSelectionChange(val) {
-      this.multipleSelection = val;
+      this.multipleSelection = val
     },
     handleUpdate(index, row) {
-      this.$router.push({ path: '/pms/updateBrand', query: { id: row.id } })
+      this.$router.push({ path: '/pms/updateBrand', query: { id: row.id }})
     },
     handleDelete(index, row) {
       this.$confirm('是否要删除该品牌', '提示', {
@@ -171,106 +162,105 @@ export default {
           this.$message({
             message: '删除成功',
             type: 'success',
-            duration: 1000
-          });
-          this.getList();
-        });
-      });
+            duration: 1500
+          })
+          this.getList()
+        })
+      })
     },
     getProductList(index, row) {
-      console.log(index, row);
+      console.log(index, row)
     },
     getProductCommentList(index, row) {
-      console.log(index, row);
+      console.log(index, row)
     },
     handleFactoryStatusChange(index, row) {
-      var data = new URLSearchParams();
-      data.append("ids", row.id);
-      data.append("factoryStatus", row.factoryStatus);
+      var data = new URLSearchParams()
+      data.append('ids', row.id)
+      data.append('factoryStatus', row.factoryStatus)
       updateFactoryStatus(data).then(response => {
         this.$message({
           message: '修改成功',
           type: 'success',
-          duration: 1000
-        });
-      }).catch(error => {
+          duration: 1500
+        })
+      }).catch(() => {
         if (row.factoryStatus === 0) {
-          row.factoryStatus = 1;
+          row.factoryStatus = 1
         } else {
-          row.factoryStatus = 0;
+          row.factoryStatus = 0
         }
-      });
+      })
     },
     handleShowStatusChange(index, row) {
-      let data = new URLSearchParams();
-      ;
-      data.append("ids", row.id);
-      data.append("showStatus", row.showStatus);
+      const data = new URLSearchParams()
+      data.append('ids', row.id)
+      data.append('showStatus', row.showStatus)
       updateShowStatus(data).then(response => {
         this.$message({
           message: '修改成功',
           type: 'success',
-          duration: 1000
-        });
-      }).catch(error => {
+          duration: 1500
+        })
+      }).catch(() => {
         if (row.showStatus === 0) {
-          row.showStatus = 1;
+          row.showStatus = 1
         } else {
-          row.showStatus = 0;
+          row.showStatus = 0
         }
-      });
+      })
     },
     handleSizeChange(val) {
-      this.listQuery.pageNum = 1;
-      this.listQuery.pageSize = val;
-      this.getList();
+      this.listQuery.pageNum = 1
+      this.listQuery.pageSize = val
+      this.getList()
     },
     handleCurrentChange(val) {
-      this.listQuery.pageNum = val;
-      this.getList();
+      this.listQuery.pageNum = val
+      this.getList()
     },
     searchBrandList() {
-      this.listQuery.pageNum = 1;
-      this.getList();
+      this.listQuery.pageNum = 1
+      this.getList()
     },
     handleBatchOperate() {
-      console.log(this.multipleSelection);
+      console.log(this.multipleSelection)
       if (this.multipleSelection < 1) {
         this.$message({
           message: '请选择一条记录',
           type: 'warning',
-          duration: 1000
-        });
-        return;
+          duration: 1500
+        })
+        return
       }
-      let showStatus = 0;
+      let showStatus = 0
       if (this.operateType === 'showBrand') {
-        showStatus = 1;
+        showStatus = 1
       } else if (this.operateType === 'hideBrand') {
-        showStatus = 0;
+        showStatus = 0
       } else {
         this.$message({
           message: '请选择批量操作类型',
           type: 'warning',
-          duration: 1000
-        });
-        return;
+          duration: 1500
+        })
+        return
       }
-      let ids = [];
+      const ids = []
       for (let i = 0; i < this.multipleSelection.length; i++) {
-        ids.push(this.multipleSelection[i].id);
+        ids.push(this.multipleSelection[i].id)
       }
-      let data = new URLSearchParams();
-      data.append("ids", ids);
-      data.append("showStatus", showStatus);
+      const data = new URLSearchParams()
+      data.append('ids', ids)
+      data.append('showStatus', showStatus)
       updateShowStatus(data).then(response => {
-        this.getList();
+        this.getList()
         this.$message({
           message: '修改成功',
           type: 'success',
-          duration: 1000
-        });
-      });
+          duration: 1500
+        })
+      })
     },
     addBrand() {
       this.$router.push({ path: '/pms/addBrand' })
@@ -280,5 +270,3 @@ export default {
 </script>
 <style rel="stylesheet/scss" lang="scss" scoped>
 </style>
-
-

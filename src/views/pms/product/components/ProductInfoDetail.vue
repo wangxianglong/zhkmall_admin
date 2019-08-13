@@ -9,13 +9,13 @@
       size="small"
     >
       <el-form-item label="商品分类：" prop="productCategoryId">
-        <el-cascader v-model="selectProductCateValue" :options="productCateOptions" clearable/>
+        <el-cascader v-model="selectProductCateValue" :options="productCateOptions" clearable />
       </el-form-item>
       <el-form-item label="商品名称：" prop="name">
-        <el-input v-model="value.name"/>
+        <el-input v-model="value.name" />
       </el-form-item>
       <el-form-item label="副标题：" prop="subTitle">
-        <el-input v-model="value.subTitle"/>
+        <el-input v-model="value.subTitle" />
       </el-form-item>
       <el-form-item label="商品品牌：" prop="brandId">
         <el-select v-model="value.brandId" placeholder="请选择品牌" @change="handleBrandChange">
@@ -28,29 +28,34 @@
         </el-select>
       </el-form-item>
       <el-form-item label="商品介绍：">
-        <el-input :auto-size="true" v-model="value.description" type="textarea" placeholder="请输入内容"/>
+        <el-input
+          :auto-size="true"
+          v-model="value.description"
+          type="textarea"
+          placeholder="请输入内容"
+        />
       </el-form-item>
       <el-form-item label="商品货号：">
-        <el-input v-model="value.productSn"/>
+        <el-input v-model="value.productSn" />
       </el-form-item>
       <el-form-item label="商品售价：">
-        <el-input v-model="value.price"/>
+        <el-input-number v-model="value.price" :min="0" />
       </el-form-item>
       <el-form-item label="市场价：">
-        <el-input v-model="value.originalPrice"/>
+        <el-input-number v-model="value.originalPrice" :min="0" />
       </el-form-item>
       <el-form-item label="商品库存：">
-        <el-input v-model="value.stock"/>
+        <el-input-number v-model="value.stock" :min="0" />
       </el-form-item>
       <el-form-item label="计量单位：">
-        <el-input v-model="value.unit"/>
+        <el-input v-model="value.unit" />
       </el-form-item>
       <el-form-item label="商品重量：">
-        <el-input v-model="value.weight" style="width: 300px"/>
-        <span style="margin-left: 20px">克</span>
+        <el-input-number v-model="value.weight" :min="0" />
+        <span style="margin-left: 5px">克</span>
       </el-form-item>
       <el-form-item label="排序">
-        <el-input v-model="value.sort"/>
+        <el-input-number v-model="value.sort" />
       </el-form-item>
       <el-form-item style="text-align: center">
         <el-button type="primary" size="medium" @click="handleNext('productInfoForm')">下一步，填写商品促销</el-button>
@@ -61,7 +66,7 @@
 
 <script>
 import { fetchListWithChildren } from '@/api/productCate'
-import { fetchList as fetchBrandList } from '@/api/brand'
+import { brandList } from '@/api/brand'
 // import { getProduct } from '@/api/product'
 
 export default {
@@ -69,7 +74,7 @@ export default {
   props: {
     value: {
       type: Object,
-      default: function() {
+      default: () => {
         return {}
       }
     },
@@ -151,7 +156,7 @@ export default {
       })
     },
     getBrandList() {
-      fetchBrandList({ pageNum: 1, pageSize: 100 }).then(response => {
+      brandList({ pageNum: 1, pageSize: 100 }).then(response => {
         this.brandOptions = []
         const brandList = response.data.list
         for (let i = 0; i < brandList.length; i++) {

@@ -103,16 +103,20 @@
         <el-card shadow="never" class="cardBg">
           <div v-for="(item, index) in selectProductAttrPics" :key="index">
             <span>{{ item.name }}:</span>
-            <single-upload
+            <!-- <single-upload
               v-model="item.pic"
               style="width: 300px;display: inline-block;margin-left: 10px"
-            />
+            />-->
           </div>
         </el-card>
       </el-form-item>
       <el-form-item label="商品参数：">
         <el-card shadow="never" class="cardBg">
-          <div v-for="(item, index) in selectProductParam" :key="index" :class="{littleMarginTop:index!==0}">
+          <div
+            v-for="(item, index) in selectProductParam"
+            :key="index"
+            :class="{littleMarginTop:index!==0}"
+          >
             <div class="paramInputLabel">{{ item.name }}:</div>
             <el-select
               v-if="item.inputType===1"
@@ -131,7 +135,7 @@
         </el-card>
       </el-form-item>
       <el-form-item label="商品相册：">
-        <multi-upload v-model="selectProductPics" />
+        <!-- <multi-upload v-model="selectProductPics" /> -->
       </el-form-item>
       <el-form-item label="规格参数：">
         <el-tabs v-model="activeHtmlName" type="card">
@@ -152,19 +156,19 @@
 </template>
 
 <script>
-import { fetchList as fetchProductAttrCateList } from '@/api/productAttrCate'
-import { fetchList as fetchProductAttrList } from '@/api/productAttr'
-import SingleUpload from '@/components/Upload/singleUpload'
-import MultiUpload from '@/components/Upload/multiUpload'
+import { attrCategoryList } from '@/api/productAttrCate'
+import { prodAttrList } from '@/api/productAttr'
+// import SingleUpload from '@/components/Upload/singleUpload'
+// import MultiUpload from '@/components/Upload/multiUpload'
 import Tinymce from '@/components/Tinymce'
 
 export default {
   name: 'ProductAttrDetail',
-  components: { SingleUpload, MultiUpload, Tinymce },
+  components: { Tinymce },
   props: {
     value: {
       type: Object,
-      default: function() {
+      default: () => {
         return {}
       }
     },
@@ -260,7 +264,7 @@ export default {
     },
     getProductAttrCateList() {
       const param = { pageNum: 1, pageSize: 100 }
-      fetchProductAttrCateList(param).then(response => {
+      attrCategoryList(param).then(response => {
         this.productAttributeCategoryOptions = []
         const list = response.data.list
         for (let i = 0; i < list.length; i++) {
@@ -269,8 +273,8 @@ export default {
       })
     },
     getProductAttrList(type, cid) {
-      const param = { pageNum: 1, pageSize: 100, type: type }
-      fetchProductAttrList(cid, param).then(response => {
+      const param = { pageNum: 1, pageSize: 100, value: cid }
+      prodAttrList(param).then(response => {
         const list = response.data.list
         if (type === 0) {
           this.selectProductAttr = []

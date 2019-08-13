@@ -2,22 +2,22 @@
   <el-card class="form-container" shadow="never">
     <el-form ref="brandFrom" :model="brand" :rules="rules" label-width="150px">
       <el-form-item label="品牌名称：" prop="name">
-        <el-input v-model="brand.name"/>
+        <el-input v-model="brand.name" />
       </el-form-item>
       <el-form-item label="品牌首字母：">
-        <el-input v-model="brand.firstLetter"/>
+        <el-input v-model="brand.firstLetter" />
       </el-form-item>
       <el-form-item label="品牌LOGO：" prop="logo">
-        <single-upload v-model="brand.logo"/>
+        <!-- <single-upload v-model="brand.logo" /> -->
       </el-form-item>
       <el-form-item label="品牌专区大图：">
-        <single-upload v-model="brand.bigPic"/>
+        <!-- <single-upload v-model="brand.bigPic" /> -->
       </el-form-item>
       <el-form-item label="品牌故事：">
-        <el-input v-model="brand.brandStory" :autosize="true" placeholder="请输入内容" type="textarea"/>
+        <el-input v-model="brand.brandStory" :autosize="true" placeholder="请输入内容" type="textarea" />
       </el-form-item>
       <el-form-item label="排序：" prop="sort">
-        <el-input v-model.number="brand.sort"/>
+        <el-input v-model.number="brand.sort" />
       </el-form-item>
       <el-form-item label="是否显示：">
         <el-radio-group v-model="brand.showStatus">
@@ -40,7 +40,7 @@
 </template>
 <script>
 import { createBrand, getBrand, updateBrand } from '@/api/brand'
-import SingleUpload from '@/components/Upload/singleUpload'
+// import SingleUpload from '@/components/Upload/singleUpload'
 const defaultBrand = {
   bigPic: '',
   brandStory: '',
@@ -53,7 +53,7 @@ const defaultBrand = {
 }
 export default {
   name: 'BrandDetail',
-  components: { SingleUpload },
+  // components: { SingleUpload },
   props: {
     isEdit: {
       type: Boolean,

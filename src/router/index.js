@@ -81,7 +81,7 @@ export const constantRouterMap = [
     component: Layout,
     redirect: '/pms/product',
     name: 'pms',
-    meta: { title: '商品管理', icon: 'product' },
+    meta: { title: '产品管理', icon: 'product' },
     children: [{
       path: 'product',
       name: 'product',

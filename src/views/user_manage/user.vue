@@ -3,9 +3,9 @@
     <!-- 查询和其他操作 -->
     <el-card class="filter-container" shadow="never">
       <div>
-        <i class="el-icon-search"></i>
+        <i class="el-icon-search"/>
         <span>筛选搜索</span>
-        <el-button style="float: right" @click="handleSearchList()" type="primary" size="small">查询结果</el-button>
+        <el-button style="float: right" type="primary" size="small" @click="handleSearchList()">查询结果</el-button>
       </div>
       <div style="margin-top: 15px">
         <el-form :inline="true" :model="listQuery" size="small" label-width="140px">
@@ -38,7 +38,7 @@
         <el-table-column align="center" label="邮箱" prop="email" />
         <el-table-column align="center" label="头像">
           <template slot-scope="scope">
-            <img :src="scope.row.icon" style="width: 50px;border-radius: 50%;" alt="头像" />
+            <img :src="scope.row.icon" style="width: 50px;border-radius: 50%;" alt="头像" >
           </template>
         </el-table-column>
         <el-table-column align="center" label="状态" prop="status">
@@ -79,15 +79,15 @@
 
     <div class="pagination-container">
       <el-pagination
-        background
-        @size-change="handleSizeChange"
-        @current-change="handleCurrentChange"
-        layout="total, sizes,prev, pager, next,jumper"
         :page-size="listQuery.pageSize"
         :page-sizes="[5,10,15]"
         :current-page.sync="listQuery.pageNum"
         :total="total"
-      ></el-pagination>
+        background
+        layout="total, sizes, prev, pager, next, jumper"
+        @size-change="handleSizeChange"
+        @current-change="handleCurrentChange"
+      />
     </div>
 
     <el-dialog :visible.sync="dialogFormVisible" title="编辑">
@@ -200,13 +200,13 @@ export default {
       })
     },
     handleSizeChange(val) {
-      this.listQuery.pageNum = 1;
-      this.listQuery.pageSize = val;
-      this.getList();
+      this.listQuery.pageNum = 1
+      this.listQuery.pageSize = val
+      this.getList()
     },
     handleCurrentChange(val) {
-      this.listQuery.pageNum = val;
-      this.getList();
+      this.listQuery.pageNum = val
+      this.getList()
     },
     handleSearchList() {
       this.listQuery.pageNum = 1

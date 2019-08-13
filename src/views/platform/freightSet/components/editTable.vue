@@ -10,29 +10,30 @@
       @selection-change="selectRow"
     >
       <div v-if="tableType === 'table'">
-        <el-table-column type="selection" width="45" align="center"></el-table-column>
+        <el-table-column type="selection" width="45" align="center" />
         <template v-for="(col, index) in columns">
           <el-table-column :prop="col.value" :label="col.headName" :key="index" align="center">
             <template slot-scope="{row}">
-              <el-input v-model="row[col.value]"></el-input>
+              <el-input v-model="row[col.value]" />
             </template>
           </el-table-column>
         </template>
       </div>
+
       <div v-else-if="tableType === 'astrict'">
         <div v-if="data[0].desc">
           <el-table-column align="center" label prop="desc" />
           <el-table-column align="center" label prop="condition" />
           <el-table-column label align="center">
             <template slot-scope="{row}">
-              <el-input v-model="row.reference"></el-input>
+              <el-input v-model="row.reference" />
             </template>
           </el-table-column>
         </div>
         <div v-else>
           <el-table-column label align="center">
             <template slot-scope="{row}">
-              <el-input v-model="row.reference"></el-input>
+              <el-input v-model="row.reference" />
             </template>
           </el-table-column>
           <el-table-column align="center" label prop="condition" />
@@ -43,24 +44,24 @@
         <el-table-column align="center" label prop="totalPrice" />
         <el-table-column align="center" label="价格" prop="price">
           <template slot-scope="{row}">
-            <el-input v-model="row.price"></el-input>
+            <el-input v-model="row.price" />
           </template>
         </el-table-column>
         <el-table-column align="center" label="收取" prop="gather" />
         <el-table-column align="center" label="固定费" prop="fixedCharge">
           <template slot-scope="{row}">
-            <el-input v-model="row.fixedCharge"></el-input>
+            <el-input v-model="row.fixedCharge" />
           </template>
         </el-table-column>
         <el-table-column align="center" label="或" prop="or" />
         <el-table-column align="center" label="总价(x%)" prop="percentage">
           <template slot-scope="{row}">
-            <el-input v-model="row.percentage"></el-input>
+            <el-input v-model="row.percentage" />
           </template>
         </el-table-column>
       </div>
       <div v-else-if="tableType === 'weightPrice'">
-        <el-table-column type="selection" width="45" align="center"></el-table-column>
+        <el-table-column type="selection" width="45" align="center" />
         <div v-for="n in interval" :key="n">
           <el-table-column label="重量" align="center">
             <template slot-scope="scope">
@@ -69,13 +70,13 @@
           </el-table-column>
           <el-table-column label="价格" align="center">
             <template slot-scope="scope">
-              <el-input v-model="scope.row[n-1][1]"></el-input>
+              <el-input v-model="scope.row[n-1][1]" />
             </template>
           </el-table-column>
         </div>
       </div>
       <div v-else-if="tableType === 'identify'">
-        <el-table-column type="selection" width="45" align="center"></el-table-column>
+        <el-table-column type="selection" width="45" align="center" />
         <div v-for="n in interval" :key="n">
           <el-table-column align="center">
             <template slot-scope="scope">
@@ -84,7 +85,7 @@
           </el-table-column>
           <el-table-column align="center">
             <template slot-scope="scope">
-              <el-input v-model="scope.row[n-1][1]" v-if="scope.row[n-1][0]"></el-input>
+              <el-input v-if="scope.row[n-1][0]" v-model="scope.row[n-1][1]" />
             </template>
           </el-table-column>
         </div>
@@ -106,20 +107,16 @@
  * 配置需要格式化的金额
  */
 export default {
-  name: 'xmtz',
-  data() {
-    return {
-      selectlistRow: [],
-      relatedNum: 1,
-      interval: 6
-    }
-  },
+  name: 'Xmtz',
   props: {
     data: {
       type: [Array, Object],
       required: true
     },
-    tableType: String,
+    tableType: {
+      type: String,
+      default: ''
+    },
     showHeader: {
       type: Boolean,
       default: true
@@ -127,7 +124,14 @@ export default {
     columns: {
       type: Array,
       default: () => []
-    },
+    }
+  },
+  data() {
+    return {
+      selectlistRow: [],
+      relatedNum: 1,
+      interval: 6
+    }
   },
   created() {
     console.log(this.data)

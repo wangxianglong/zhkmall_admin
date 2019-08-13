@@ -1,5 +1,6 @@
 import request from '@/utils/request'
-export function fetchList(parentId, params) {
+// 商品分类列表
+export function categoryList(parentId, params) {
   return request({
     url: '/productCategory/list/' + parentId,
     method: 'get',

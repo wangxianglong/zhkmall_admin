@@ -1,5 +1,6 @@
 import request from '@/utils/request'
-export function fetchList(params) {
+// 获取品牌列表
+export function brandList(params) {
   return request({
     url: '/brand/list',
     method: 'get',

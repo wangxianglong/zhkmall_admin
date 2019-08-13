@@ -1,7 +1,8 @@
 import request from '@/utils/request'
-export function fetchList(cid, params) {
+// 获取商品属性列表
+export function prodAttrList(params) {
   return request({
-    url: '/productAttribute/list/' + cid,
+    url: '/productAttribute/value/list',
     method: 'get',
     params: params
   })

@@ -1,5 +1,6 @@
 import request from '@/utils/request'
-export function fetchList(params) {
+// 获取商品属性分类列表
+export function attrCategoryList(params) {
   return request({
     url: '/productAttribute/category/list',
     method: 'get',

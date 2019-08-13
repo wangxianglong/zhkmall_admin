@@ -1,15 +1,14 @@
 <template>
-  <product-attr-detail :is-edit='false'></product-attr-detail>
+  <product-attr-detail :is-edit="false" />
 </template>
 
 <script>
-  import ProductAttrDetail from './components/ProductAttrDetail'
-  export default {
-    name: 'addProductAttr',
-    components: { ProductAttrDetail }
-  }
+import ProductAttrDetail from './components/ProductAttrDetail'
+export default {
+  name: 'AddProductAttr',
+  components: { ProductAttrDetail }
+}
 </script>
 
 <style scoped>
-
 </style>
