@@ -13,22 +13,22 @@
         style="width: 100%"
         border
       >
-        <el-table-column label="类型名称" width="100" align="center" prop="name" />
-        <el-table-column label="属性数量" width="200" align="center">
+        <el-table-column label="类型名称" align="center" prop="name" />
+        <el-table-column label="属性数量" align="center">
           <template
             slot-scope="scope"
           >{{ scope.row.attributeCount==null?0:scope.row.attributeCount }}</template>
         </el-table-column>
-        <el-table-column label="参数数量" width="200" align="center">
+        <el-table-column label="参数数量" align="center">
           <template slot-scope="scope">{{ scope.row.paramCount==null?0:scope.row.paramCount }}</template>
         </el-table-column>
-        <el-table-column label="设置" width="200" align="center">
+        <el-table-column label="设置" align="center">
           <template slot-scope="scope">
             <el-button size="mini" @click="getAttrList(scope.$index, scope.row)">属性列表</el-button>
             <el-button size="mini" @click="getParamList(scope.$index, scope.row)">参数列表</el-button>
           </template>
         </el-table-column>
-        <el-table-column label="操作" width="180" align="center">
+        <el-table-column label="操作" align="center">
           <template slot-scope="scope">
             <el-button type="primary" size="mini" @click="handleUpdate(scope.$index, scope.row)">编辑</el-button>
             <el-button type="danger" size="mini" @click="handleDelete(scope.$index, scope.row)">删除</el-button>
@@ -73,7 +73,7 @@ export default {
       listLoading: true,
       listQuery: {
         pageNum: 1,
-        pageSize: 5
+        pageSize: 10
       },
       dialogVisible: false,
       dialogTitle: '',

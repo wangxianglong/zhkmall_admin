@@ -7,17 +7,41 @@
       <el-form-item label="品牌首字母：">
         <el-input v-model="brand.firstLetter" />
       </el-form-item>
-      <el-form-item label="品牌LOGO：" prop="logo">
-        <!-- <single-upload v-model="brand.logo" /> -->
-      </el-form-item>
-      <el-form-item label="品牌专区大图：">
-        <!-- <single-upload v-model="brand.bigPic" /> -->
-      </el-form-item>
-      <el-form-item label="品牌故事：">
-        <el-input v-model="brand.brandStory" :autosize="true" placeholder="请输入内容" type="textarea" />
-      </el-form-item>
       <el-form-item label="排序：" prop="sort">
         <el-input v-model.number="brand.sort" />
+      </el-form-item>
+      <el-form-item label="品牌LOGO：" prop="logo">
+        <el-upload
+          :http-request="fnUploadLogoUrl"
+          :show-file-list="true"
+          :file-list="logoUrl"
+          :on-remove="handleRemoveLogo"
+          :on-exceed="beyondFile"
+          :limit="1"
+          :before-upload="beforeAvatarUpload"
+          list-type="picture-card"
+          action
+        >
+          <i class="el-icon-plus" />
+        </el-upload>
+      </el-form-item>
+      <el-form-item label="品牌专区大图：">
+        <el-upload
+          :http-request="fnUploadBigPicUrlUrl"
+          :show-file-list="true"
+          :file-list="bigPicUrl"
+          :on-remove="handleRemoveBigPic"
+          :on-exceed="beyondFile"
+          :limit="1"
+          :before-upload="beforeAvatarUpload"
+          list-type="picture-card"
+          action
+        >
+          <i class="el-icon-plus" />
+        </el-upload>
+      </el-form-item>
+      <el-form-item label="品牌故事：">
+        <el-input v-model="brand.brandStory" :rows="2" placeholder="请输入内容" type="textarea" />
       </el-form-item>
       <el-form-item label="是否显示：">
         <el-radio-group v-model="brand.showStatus">
@@ -32,15 +56,16 @@
         </el-radio-group>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" @click="onSubmit('brandFrom')">提交</el-button>
         <el-button v-if="!isEdit" @click="resetForm('brandFrom')">重置</el-button>
+        <el-button type="primary" @click="onSubmit('brandFrom')">提交</el-button>
       </el-form-item>
     </el-form>
   </el-card>
 </template>
 <script>
 import { createBrand, getBrand, updateBrand } from '@/api/brand'
-// import SingleUpload from '@/components/Upload/singleUpload'
+import oss from '@/utils/aliOss'
+
 const defaultBrand = {
   bigPic: '',
   brandStory: '',
@@ -63,6 +88,8 @@ export default {
   data() {
     return {
       brand: Object.assign({}, defaultBrand),
+      logoUrl: [],
+      bigPicUrl: [],
       rules: {
         name: [
           { required: true, message: '请输入品牌名称', trigger: 'blur' },
@@ -95,6 +122,18 @@ export default {
             cancelButtonText: '取消',
             type: 'warning'
           }).then(() => {
+            if (this.logoUrl.length === 0) {
+              this.$message({
+                message: '请上传品牌Logo',
+                type: 'warning',
+                duration: 1500
+              })
+              return
+            }
+            this.brand.logo = this.logoUrl[0].url
+            if (this.bigPicUrl.length > 0) {
+              this.brand.bigPic = this.bigPicUrl[0].url
+            }
             if (this.isEdit) {
               updateBrand(this.$route.query.id, this.brand).then(response => {
                 this.$refs[formName].resetFields()
@@ -108,12 +147,12 @@ export default {
             } else {
               createBrand(this.brand).then(response => {
                 this.$refs[formName].resetFields()
-                this.brand = Object.assign({}, defaultBrand)
                 this.$message({
                   message: '提交成功',
                   type: 'success',
                   duration: 1000
                 })
+                this.$router.back()
               })
             }
           })
@@ -125,6 +164,43 @@ export default {
           })
           return false
         }
+      })
+    },
+    async fnUploadLogoUrl(option) {
+      oss.ossUploadFile(option).then(res => {
+        this.logoUrl = [{ url: res.fileUrl }]
+      })
+    },
+    async fnUploadBigPicUrlUrl(option) {
+      oss.ossUploadFile(option).then(res => {
+        this.bigPicUrlUrl = [{ url: res.fileUrl }]
+      })
+    },
+    beforeAvatarUpload(file) {
+      let isIMAGE = false
+      if (
+        file.type === 'image/jpeg' ||
+        file.type === 'image/gif' ||
+        file.type === 'image/png'
+      ) {
+        isIMAGE = true
+      }
+      if (!isIMAGE) {
+        this.$message.error('上传文件只能是图片格式!')
+      }
+      return isIMAGE
+    },
+    handleRemoveLogo(file, fileList) {
+      this.logoUrl = []
+    },
+    handleRemoveBigPic(file, fileList) {
+      this.bigPicUrl = []
+    },
+    // 添加多个文件事件
+    beyondFile(files, fileList) {
+      this.$message({
+        message: '最多上传' + fileList.length + '张图片',
+        type: 'error'
       })
     },
     resetForm(formName) {

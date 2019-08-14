@@ -29,10 +29,17 @@
         @selection-change="handleSelectionChange"
       >
         <el-table-column type="selection" width="60" align="center" />
-        <el-table-column label="排序" width="100" align="center" prop="sort" />
-        <el-table-column label="品牌名称" width="100" align="center" prop="name" />
-        <el-table-column label="品牌首字母" width="100" align="center" prop="firstLetter" />
-        <el-table-column label="品牌制造商" width="100" align="center">
+        <el-table-column label="排序" width="100" align="center" prop="sort" sortable />
+        <el-table-column label="品牌名称" align="center" prop="name" />
+        <el-table-column label="品牌首字母" align="center" prop="firstLetter" />
+        <el-table-column label="品牌Logo" align="center">
+          <template slot-scope="scope">
+            <img :src="scope.row.logo" :alt="scope.row.name" style="height: 40px">
+          </template>
+        </el-table-column>
+        <el-table-column label="商品数" align="center" prop="productCount" />
+        <el-table-column label="评论数" align="center" prop="productCommentCount" />
+        <el-table-column label="品牌制造商" align="center">
           <template slot-scope="scope">
             <el-switch
               :active-value="1"
@@ -42,7 +49,7 @@
             />
           </template>
         </el-table-column>
-        <el-table-column label="是否显示" width="100" align="center">
+        <el-table-column label="是否显示" align="center">
           <template slot-scope="scope">
             <el-switch
               :active-value="1"
@@ -52,19 +59,19 @@
             />
           </template>
         </el-table-column>
-        <el-table-column label="相关" width="220" align="center">
+        <!-- <el-table-column label="相关" align="center">
           <template slot-scope="scope">
-            <span>商品：</span>
-            <el-button size="mini" type="text" @click="getProductList(scope.$index, scope.row)">100</el-button>
-            <span>评价：</span>
+            <span>商品数：</span>
+            <el-button size="mini" type="text" @click="getProductList(scope.$index, scope.row)">{{ scope.row.productCount }}</el-button>
+            <span style="margin-left: 10px;">评论数：</span>
             <el-button
               size="mini"
               type="text"
               @click="getProductCommentList(scope.$index, scope.row)"
-            >1000</el-button>
+            >{{ scope.row.productCommentCount }}</el-button>
           </template>
-        </el-table-column>
-        <el-table-column label="操作" width="200" align="center">
+        </el-table-column> -->
+        <el-table-column label="操作" align="center">
           <template slot-scope="scope">
             <el-button size="mini" type="primary" @click="handleUpdate(scope.$index, scope.row)">编辑</el-button>
             <el-button size="mini" type="danger" @click="handleDelete(scope.$index, scope.row)">删除</el-button>
@@ -168,12 +175,12 @@ export default {
         })
       })
     },
-    getProductList(index, row) {
-      console.log(index, row)
-    },
-    getProductCommentList(index, row) {
-      console.log(index, row)
-    },
+    // getProductList(index, row) {
+    //   console.log(index, row)
+    // },
+    // getProductCommentList(index, row) {
+    //   console.log(index, row)
+    // },
     handleFactoryStatusChange(index, row) {
       var data = new URLSearchParams()
       data.append('ids', row.id)

@@ -15,7 +15,7 @@
         @selection-change="handleSelectionChange"
       >
         <el-table-column type="selection" width="60" align="center" />
-        <el-table-column label="排序" prop="sort" width="100" align="center" sortable />
+        <!-- <el-table-column label="ID" prop="id" width="100" align="center" sortable /> -->
         <el-table-column label="属性名称" prop="name" width="100" align="center" />
         <el-table-column label="商品类型" width="140" align="center">
           <template>{{ $route.query.cname }}</template>
@@ -27,7 +27,8 @@
           <template slot-scope="scope">{{ scope.row.inputType|inputTypeFilter }}</template>
         </el-table-column>
         <el-table-column label="可选值列表" prop="inputList" width="100" align="center" />
-        <el-table-column label="操作" width="200" align="center">
+        <el-table-column label="参数值" prop="value" align="center" />
+        <el-table-column label="操作" align="center">
           <template slot-scope="scope">
             <el-button size="mini" type="primary" @click="handleUpdate(scope.$index, scope.row)">编辑</el-button>
             <el-button size="mini" type="danger" @click="handleDelete(scope.$index, scope.row)">删除</el-button>
@@ -35,23 +36,11 @@
         </el-table-column>
       </el-table>
     </div>
+
     <div class="batch-operate-container">
-      <el-select v-model="operateType" size="small" placeholder="批量操作">
-        <el-option
-          v-for="item in operates"
-          :key="item.value"
-          :label="item.label"
-          :value="item.value"
-        />
-      </el-select>
-      <el-button
-        style="margin-left: 20px"
-        class="search-button"
-        type="primary"
-        size="small"
-        @click="handleBatchOperate()"
-      >确定</el-button>
+      <el-button class="search-button" type="danger" size="small" @click="handleBatchOperate()">批量删除</el-button>
     </div>
+
     <div class="pagination-container">
       <el-pagination
         :page-size="listQuery.pageSize"
@@ -96,7 +85,7 @@ export default {
       listLoading: true,
       listQuery: {
         pageNum: 1,
-        pageSize: 5,
+        pageSize: 10,
         type: this.$route.query.type
       },
       operateType: null,
@@ -127,13 +116,16 @@ export default {
       })
     },
     addProductAttr() {
-      this.$router.push({ path: '/pms/addProductAttr', query: { cid: this.$route.query.cid, type: this.$route.query.type }})
+      this.$router.push({
+        path: '/pms/addProductAttr',
+        query: { cid: this.$route.query.cid, type: this.$route.query.type }
+      })
     },
     handleSelectionChange(val) {
       this.multipleSelection = val
     },
     handleBatchOperate() {
-      if (this.multipleSelection < 1) {
+      if (this.multipleSelection == null || this.multipleSelection.length < 1) {
         this.$message({
           message: '请选择一条记录',
           type: 'warning',
@@ -141,19 +133,39 @@ export default {
         })
         return
       }
-      if (this.operateType !== 'deleteProductAttr') {
-        this.$message({
-          message: '请选择批量操作类型',
-          type: 'warning',
-          duration: 1500
+      this.$confirm('是否要进行该批量操作?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        const ids = []
+        for (let i = 0; i < this.multipleSelection.length; i++) {
+          ids.push(this.multipleSelection[i].id)
+        }
+        const params = new URLSearchParams()
+        params.append('ids', ids)
+        deleteProductAttr(params).then(response => {
+          for (let i = 0; i < this.multipleSelection.length; i++) {
+            // 获取选中行的索引的方法
+            // 遍历表格中relatedData数据和选中的val数据，比较它们的sort,相等则输出选中行的索引
+            ids.forEach((val, index) => {
+              this.list.forEach((v, i) => {
+                if (val === v.id) {
+                  // i 为选中的索引
+                  this.list.splice(i, 1)
+                }
+              })
+            })
+          }
+          // // 删除完数据之后清除勾选框
+          this.$refs.productAttrTable.clearSelection()
+          this.$message({
+            message: '删除成功',
+            type: 'success',
+            duration: 1500
+          })
         })
-        return
-      }
-      const ids = []
-      for (let i = 0; i < this.multipleSelection.length; i++) {
-        ids.push(this.multipleSelection[i].id)
-      }
-      this.handleDeleteProductAttr(ids)
+      })
     },
     handleSizeChange(val) {
       this.listQuery.pageNum = 1
@@ -165,7 +177,10 @@ export default {
       this.getList()
     },
     handleUpdate(index, row) {
-      this.$router.push({ path: '/pms/updateProductAttr', query: { id: row.id }})
+      this.$router.push({
+        path: '/pms/updateProductAttr',
+        query: { id: row.id }
+      })
     },
     handleDeleteProductAttr(ids) {
       this.$confirm('是否要删除该属性', '提示', {
@@ -186,9 +201,22 @@ export default {
       })
     },
     handleDelete(index, row) {
-      const ids = []
-      ids.push(row.id)
-      this.handleDeleteProductAttr(ids)
+      this.$confirm('是否删除属性 ' + row.name + ' ?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        const params = new URLSearchParams()
+        params.append('ids', [row.id])
+        deleteProductAttr(params).then(response => {
+          this.list.splice(index, 1)
+          this.$notify.success({
+            title: '成功',
+            message: '删除属性成功',
+            duration: 1500
+          })
+        })
+      })
     }
   }
 }

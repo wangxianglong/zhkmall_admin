@@ -112,6 +112,7 @@ export default {
   },
   created() {
     if (this.isEdit) {
+      console.log(this.$route.query.id)
       getProductAttr(this.$route.query.id).then(response => {
         this.productAttr = response.data
         this.inputListFormat = this.productAttr.inputList.replace(/,/g, '\n')

@@ -1,6 +1,6 @@
 <template>
   <el-card class="form-container" shadow="never">
-    <el-form ref="productCateFrom" :model="productCate" :rules="rules" label-width="150px">
+    <el-form ref="productCateFrom" :model="productCate" :rules="rules" label-width="130px">
       <el-form-item label="分类名称：" prop="name">
         <el-input v-model="productCate.name" />
       </el-form-item>
@@ -14,19 +14,22 @@
           />
         </el-select>
       </el-form-item>
+      <el-form-item v-if="isEdit" label="商品数：">
+        <span>{{ productCate.productCount }}</span>
+      </el-form-item>
       <el-form-item label="数量单位：">
         <el-input v-model="productCate.productUnit" />
       </el-form-item>
       <el-form-item label="排序：">
         <el-input-number v-model="productCate.sort" />
       </el-form-item>
-      <el-form-item label="是否显示：">
+      <el-form-item label="启用：">
         <el-radio-group v-model="productCate.showStatus">
           <el-radio :label="1">是</el-radio>
           <el-radio :label="0">否</el-radio>
         </el-radio-group>
       </el-form-item>
-      <el-form-item label="是否显示在导航栏：">
+      <el-form-item label="导航栏显示：">
         <el-radio-group v-model="productCate.navStatus">
           <el-radio :label="1">是</el-radio>
           <el-radio :label="0">否</el-radio>
@@ -52,7 +55,12 @@
         :label="index | filterLabelFilter"
         :key="filterProductAttr.key"
       >
-        <el-cascader v-model="filterProductAttr.value" :options="filterAttrs" clearable />
+        <el-cascader
+          v-model="filterProductAttr.value"
+          :options="filterAttrs"
+          :props="prodAttrProps"
+          clearable
+        />
         <el-button style="margin-left: 20px" @click.prevent="removeFilterAttr(filterProductAttr)">删除</el-button>
       </el-form-item>
       <el-form-item>
@@ -65,8 +73,8 @@
         <el-input :rows="2" v-model="productCate.description" type="textarea" />
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" @click="onSubmit('productCateFrom')">提交</el-button>
         <el-button v-if="!isEdit" @click="resetForm('productCateFrom')">重置</el-button>
+        <el-button type="primary" @click="onSubmit('productCateFrom')">提交</el-button>
       </el-form-item>
     </el-form>
   </el-card>
@@ -75,7 +83,7 @@
 <script>
 import { categoryList, createProductCate, updateProductCate, getProductCate } from '@/api/productCate'
 import { fetchListWithAttr } from '@/api/productAttrCate'
-import { getProductAttrInfo } from '@/api/productAttr'
+// import { getProductAttrInfo } from '@/api/productAttr'
 import oss from '@/utils/aliOss'
 
 const defaultProductCate = {
@@ -112,6 +120,11 @@ export default {
       productCate: Object.assign({}, defaultProductCate),
       selectProductCateList: [],
       picUrl: [],
+      prodAttrProps: {
+        value: 'id',
+        label: 'name',
+        children: 'productAttributeList'
+      },
       rules: {
         name: [
           { required: true, message: '请输入品牌名称', trigger: 'blur' },
@@ -127,19 +140,31 @@ export default {
   created() {
     if (this.isEdit) {
       getProductCate(this.$route.query.id).then(response => {
-        this.productCate = response.data
-      })
-      getProductAttrInfo(this.$route.query.id).then(response => {
-        if (response.data != null && response.data.length > 0) {
-          this.filterProductAttrList = []
-          for (let i = 0; i < response.data.length; i++) {
-            this.filterProductAttrList.push({
-              key: Date.now() + i,
-              value: [response.data[i].attributeCategoryId, response.data[i].attributeId]
-            })
-          }
+        const data = response.data
+        data.productAttributeIdList = [2, 33]
+        this.productCate = data
+        if (data.icon) {
+          this.picUrl.push({ url: data.icon })
+        }
+        if (data.productAttributeIdList.length > 0) {
+          const attrList = []
+          data.productAttributeIdList.forEach(item => {
+            attrList.push({ value: item })
+          })
+          this.filterProductAttrList = attrList
         }
       })
+      // getProductAttrInfo(this.$route.query.id).then(response => {
+      //   if (response.data != null && response.data.length > 0) {
+      //     this.filterProductAttrList = []
+      //     for (let i = 0; i < response.data.length; i++) {
+      //       this.filterProductAttrList.push({
+      //         key: Date.now() + i,
+      //         value: [response.data[i].attributeCategoryId, response.data[i].attributeId]
+      //       })
+      //     }
+      //   }
+      // })
     } else {
       this.productCate = Object.assign({}, defaultProductCate)
     }
@@ -155,20 +180,7 @@ export default {
     },
     getProductAttrCateList() {
       fetchListWithAttr().then(response => {
-        const list = response.data
-        for (let i = 0; i < list.length; i++) {
-          const productAttrCate = list[i]
-          const children = []
-          if (productAttrCate.productAttributeList != null && productAttrCate.productAttributeList.length > 0) {
-            for (let j = 0; j < productAttrCate.productAttributeList.length; j++) {
-              children.push({
-                label: productAttrCate.productAttributeList[j].name,
-                value: productAttrCate.productAttributeList[j].id
-              })
-            }
-          }
-          this.filterAttrs.push({ label: productAttrCate.name, value: productAttrCate.id, children: children })
-        }
+        this.filterAttrs = response.data
       })
     },
     getProductAttributeIdList() {
@@ -219,8 +231,11 @@ export default {
             cancelButtonText: '取消',
             type: 'warning'
           }).then(() => {
+            if (this.picUrl.length > 0) {
+              this.productCate.icon = this.picUrl[0].url
+            }
+            this.productCate.productAttributeIdList = this.getProductAttributeIdList()
             if (this.isEdit) {
-              this.productCate.productAttributeIdList = this.getProductAttributeIdList()
               updateProductCate(this.$route.query.id, this.productCate).then(response => {
                 this.$message({
                   message: '修改成功',
@@ -230,15 +245,14 @@ export default {
                 this.$router.back()
               })
             } else {
-              this.productCate.productAttributeIdList = this.getProductAttributeIdList()
               createProductCate(this.productCate).then(response => {
                 this.$refs[formName].resetFields()
-                this.resetForm(formName)
                 this.$message({
                   message: '提交成功',
                   type: 'success',
-                  duration: 1000
+                  duration: 1500
                 })
+                this.$router.back()
               })
             }
           })
