@@ -20,7 +20,12 @@
             <el-input v-model="listQuery.productSn" style="width: 203px" placeholder="商品货号" />
           </el-form-item>
           <el-form-item label="商品分类：">
-            <el-cascader v-model="selectProductCateValue" :options="productCateOptions" clearable />
+            <el-cascader
+              v-model="selectProductCateValue"
+              :options="productCateOptions"
+              :props="prodCateProps"
+              clearable
+            />
           </el-form-item>
           <el-form-item label="商品品牌：">
             <el-select v-model="listQuery.brandId" placeholder="请选择品牌" clearable>
@@ -76,16 +81,16 @@
             <img :src="scope.row.pic" :alt="scope.row.name" style="height: 80px">
           </template>
         </el-table-column>
-        <el-table-column label="商品名称" min-width="110" align="center">
+        <el-table-column label="名称/品牌" min-width="110" align="center">
           <template slot-scope="scope">
             <p>{{ scope.row.name }}</p>
             <p>品牌：{{ scope.row.brandName }}</p>
           </template>
         </el-table-column>
+        <el-table-column label="分类名称" width="100" align="center" prop="productCategoryName" />
         <el-table-column label="价格/货号" width="150" align="center">
           <template slot-scope="scope">
             <p>价格：￥{{ scope.row.price }}</p>
-            <p>促销价：{{ scope.row.promotionPrice? `￥${scope.row.promotionPrice}`: '无' }}</p>
             <p>货号：{{ scope.row.productSn }}</p>
           </template>
         </el-table-column>
@@ -119,8 +124,8 @@
               <el-switch
                 :active-value="1"
                 :inactive-value="0"
-                v-model="scope.row.recommandStatus"
-                @change="handleStatusChange(scope.row, 'recommandStatus')"
+                v-model="scope.row.recommendStatus"
+                @change="handleStatusChange(scope.row, 'recommendStatus')"
               />
             </p>
           </template>
@@ -168,7 +173,12 @@
     </div>
     <div class="batch-operate-container">
       <el-select v-model="operateType" size="small" clearable placeholder="批量操作">
-        <el-option v-for="item in operates" :key="item.value" :label="item.label" :value="item" />
+        <el-option
+          v-for="item in operates"
+          :key="item.value"
+          :label="item.label"
+          :value="item.label"
+        />
       </el-select>
       <el-button
         style="margin-left: 20px"
@@ -283,7 +293,8 @@ export default {
         productAttr: [],
         keyword: null
       },
-      statusTypeMap: { publishStatus: '上架状态', recommandStatus: '推荐状态', newStatus: '新品状态', deleteStatus: '删除状态' },
+      statusTypeMap: { publishStatus: '上架状态', recommendStatus: '推荐状态', newStatus: '新品状态', deleteStatus: '删除状态' },
+      prodCateProps: { value: 'id', label: 'name' },
       operates: [
         {
           label: '商品上架',
@@ -297,12 +308,12 @@ export default {
         },
         {
           label: '设为推荐',
-          statusType: 'recommandStatus',
+          statusType: 'recommendStatus',
           status: 1
         },
         {
           label: '取消推荐',
-          statusType: 'recommandStatus',
+          statusType: 'recommendStatus',
           status: 0
         },
         {
@@ -326,7 +337,7 @@ export default {
           status: 0
         }
       ],
-      operateType: {},
+      operateType: null,
       listQuery: Object.assign({}, defaultListQuery),
       list: null,
       total: null,
@@ -395,17 +406,7 @@ export default {
     },
     getProductCateList() {
       fetchListWithChildren().then(response => {
-        const list = response.data
-        this.productCateOptions = []
-        for (let i = 0; i < list.length; i++) {
-          const children = []
-          if (list[i].children != null && list[i].children.length > 0) {
-            for (let j = 0; j < list[i].children.length; j++) {
-              children.push({ label: list[i].children[j].name, value: list[i].children[j].id })
-            }
-          }
-          this.productCateOptions.push({ label: list[i].name, value: list[i].id, children: children })
-        }
+        this.productCateOptions = response.data
       })
     },
     handleShowSkuEditDialog(index, row) {
@@ -474,9 +475,9 @@ export default {
       })
     },
     handleBatchOperate() {
-      if (this.operateType == null) {
+      if (!this.operateType || this.operateType === null) {
         this.$message({
-          message: '请选择操作类型',
+          message: '请选择批量操作类型',
           type: 'warning',
           duration: 1500
         })
@@ -484,7 +485,7 @@ export default {
       }
       if (this.multipleSelection == null || this.multipleSelection.length < 1) {
         this.$message({
-          message: '请选择要操作的商品',
+          message: '请至少选择一条记录',
           type: 'warning',
           duration: 1500
         })
@@ -496,11 +497,17 @@ export default {
         type: 'warning'
       }).then(() => {
         const ids = []
+        let statusType = ''
+        let status = 0
         for (let i = 0; i < this.multipleSelection.length; i++) {
           ids.push(this.multipleSelection[i].id)
         }
-        const statusType = this.operateType.statusType
-        const status = this.operateType.status
+        this.operates.forEach(item => {
+          if (item.label === this.operateType) {
+            statusType = item.statusType
+            status = item.status
+          }
+        })
         this.handleEditStatus(ids, statusType, status)
       })
     },
@@ -508,7 +515,6 @@ export default {
       const params = new URLSearchParams()
       params.append('ids', ids)
       params.append(statusType, status)
-      console.log(params)
 
       switch (statusType) {
         case 'publishStatus':
@@ -516,7 +522,7 @@ export default {
             this.operateCallBack(ids, statusType, status)
           })
           break
-        case 'recommandStatus':
+        case 'recommendStatus':
           updateRecommendStatus(params).then(response => {
             this.operateCallBack(ids, statusType, status)
           })
@@ -533,7 +539,7 @@ export default {
           break
         default:
           this.$message({
-            message: '请选择操作类型',
+            message: '请选择批量操作类型',
             type: 'warning',
             duration: 1500
           })
@@ -566,7 +572,10 @@ export default {
       })
     },
     handleUpdateProduct(index, row) {
-      this.$router.push({ path: '/pms/updateProduct', query: { id: row.id }})
+      this.$router.push({
+        path: '/pms/updateProduct',
+        query: { id: row.id }
+      })
     }
     // handleShowProduct(index, row) {
     //   console.log("handleShowProduct", row)

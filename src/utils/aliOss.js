@@ -9,32 +9,29 @@ export default {
    */
   ossUploadFile(option) {
     // 先要获取后端签名
-    const pro = new Promise((resolve, rej) => {
+    const pro = new Promise((resolve) => {
       axios.get(uploadPath).then(res => {
         resolve(res.data.data)
       })
     })
 
     var file = option.file
-    return new Promise((resolve, reject) => {
-      pro.then(success => {
-        var data = success
+    return new Promise((resolve) => {
+      pro.then(res => {
         var ossData = new FormData()
-        var dir = data.dir
-        ossData.append('key', data.dir + file.name)
-        ossData.append('policy', data.policy)
-        ossData.append('OSSAccessKeyId', data.accessKeyId)
+        const key = res.dir + file.name
+        ossData.append('key', key)
+        ossData.append('policy', res.policy)
+        ossData.append('OSSAccessKeyId', res.accessKeyId)
         ossData.append('success_action_status', 200)
-        ossData.append('signature', data.signature)
+        ossData.append('signature', res.signature)
         ossData.append('file', file, file.name)
-        axios
-          .post('http://cwx-mall.oss-cn-hangzhou.aliyuncs.com/', ossData)
-          .then(res => {
-            resolve({
-              fileName: file.name,
-              fileUrl: res.config.url + dir + file.name
-            })
+        axios.post(res.host, ossData).then(() => {
+          resolve({
+            fileName: file.name,
+            fileUrl: res.host + '/' + key
           })
+        })
       })
     })
   }

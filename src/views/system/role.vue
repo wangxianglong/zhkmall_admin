@@ -117,15 +117,11 @@
         ref="tree"
         :data="systemPermissions"
         :default-checked-keys="assignedPermissions"
+        :props="treeProps"
         show-checkbox
         node-key="id"
         highlight-current
-      >
-        <span slot-scope="{ node, data }" class="custom-tree-node">
-          <span>{{ data.name }}</span>
-          <el-tag v-if="data.api" type="success" size="mini">{{ data.api }}</el-tag>
-        </span>
-      </el-tree>
+      />
       <div slot="footer" class="dialog-footer">
         <el-button @click="permissionDialogFormVisible = false">取消</el-button>
         <el-button type="primary" @click="handleUpdatePerm">确定</el-button>
@@ -159,6 +155,7 @@ export default {
       multipleSelection: [],
       statusMap: ['禁用', '启用'],
       statuType: ['info', 'success'],
+      treeProps: { label: 'name' },
       dialogStatus: '',
       textMap: {
         update: '编辑',
@@ -349,7 +346,7 @@ export default {
       this.permissionForm.roleId = row.id
     },
     handleUpdatePerm() {
-      this.permissionForm.permissionIds = this.$refs.tree.getCheckedKeys(true)
+      this.permissionForm.permissionIds = this.$refs.tree.getCheckedKeys()
       const params = new URLSearchParams()
       params.append('permissionIds', this.permissionForm.permissionIds)
 

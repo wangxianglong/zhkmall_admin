@@ -61,13 +61,13 @@
         <!--</el-col>-->
       </el-row>
     </div>
-    <el-card class="mine-layout">
-      <!-- <div style="text-align: center">
+    <!-- <el-card class="mine-layout">
+      <div style="text-align: center">
         <img width="150px" height="150px" src="http://macro-oss.oss-cn-shenzhen.aliyuncs.com/mall/banner/qrcode_for_macrozheng_258.jpg">
       </div>
       <div style="text-align: center">mall全套学习教程连载中！</div>
-      <div style="text-align: center;margin-top: 5px"><span class="color-main">关注公号</span>，第一时间获取。</div> -->
-    </el-card>
+      <div style="text-align: center;margin-top: 5px"><span class="color-main">关注公号</span>，第一时间获取。</div>
+    </el-card>-->
     <div class="un-handle-layout">
       <div class="layout-title">待处理事务</div>
       <div class="un-handle-content">
@@ -227,14 +227,23 @@
               range-separator="至"
               start-placeholder="开始日期"
               end-placeholder="结束日期"
-              @change="handleDateChange"/>
+              @change="handleDateChange"
+            />
             <div>
-              <ve-line
+              <!-- <ve-line
                 :data="chartData"
                 :legend-visible="false"
                 :loading="loading"
                 :data-empty="dataEmpty"
-                :settings="chartSettings"/>
+              :settings="chartSettings"/>-->
+              <chart
+                :xdata="takeoutChart.dateArray"
+                :marketarray="takeoutChart.marketArray"
+                :numberarray="takeoutChart.numberArray"
+                :id="'takeoutOrder'"
+                height="400px"
+                width="100%"
+              />
             </div>
           </div>
         </el-col>
@@ -248,6 +257,7 @@ import { str2Date } from '@/utils/date'
 import img_home_order from '@/assets/images/home_order.png'
 import img_home_today_amount from '@/assets/images/home_today_amount.png'
 import img_home_yesterday_amount from '@/assets/images/home_yesterday_amount.png'
+import Chart from '@/components/Charts/LineMarker'
 const DATA_FROM_BACKEND = {
   columns: ['date', 'orderCount', 'orderAmount'],
   rows: [
@@ -270,6 +280,7 @@ const DATA_FROM_BACKEND = {
 }
 export default {
   name: 'Homes',
+  components: { Chart },
   data() {
     return {
       pickerOptions: {
@@ -297,12 +308,18 @@ export default {
           }
         }]
       },
+      takeoutChart: {
+        dateArray: ['2018-11-01', '2018-11-02', '2018-11-03', '2018-11-04', '2018-11-05', '2018-11-06', '2018-11-07'],
+        marketArray: [10, 20, 33, 50, 80, 60, 20],
+        numberArray: [1093, 2230, 3623, 6423, 8492, 6293, 2293]
+      },
       orderCountDate: '',
       chartSettings: {
         xAxisType: 'time',
         area: true,
         axisSite: { right: ['orderAmount'] },
-        labelMap: { 'orderCount': '订单数量', 'orderAmount': '订单金额' }},
+        labelMap: { 'orderCount': '订单数量', 'orderAmount': '订单金额' }
+      },
       chartData: {
         columns: [],
         rows: []
@@ -355,99 +372,99 @@ export default {
 </script>
 
 <style scoped>
-  .app-container {
-    margin-top: 40px;
-    margin-left: 120px;
-    margin-right: 120px;
-  }
+.app-container {
+  margin-top: 40px;
+  margin-left: 120px;
+  margin-right: 120px;
+}
 
-  .address-layout {
-  }
+.address-layout {
+}
 
-  .total-layout {
-    margin-top: 20px;
-  }
+.total-layout {
+  margin-top: 20px;
+}
 
-  .total-frame {
-    border: 1px solid #DCDFE6;
-    padding: 20px;
-    height: 100px;
-  }
+.total-frame {
+  border: 1px solid #dcdfe6;
+  padding: 20px;
+  height: 100px;
+}
 
-  .total-icon {
-    color: #409EFF;
-    width: 60px;
-    height: 60px;
-  }
+.total-icon {
+  color: #409eff;
+  width: 60px;
+  height: 60px;
+}
 
-  .total-title {
-    position: relative;
-    font-size: 16px;
-    color: #909399;
-    left: 70px;
-    top: -50px;
-  }
+.total-title {
+  position: relative;
+  font-size: 16px;
+  color: #909399;
+  left: 70px;
+  top: -50px;
+}
 
-  .total-value {
-    position: relative;
-    font-size: 18px;
-    color: #606266;
-    left: 70px;
-    top: -40px;
-  }
+.total-value {
+  position: relative;
+  font-size: 18px;
+  color: #606266;
+  left: 70px;
+  top: -40px;
+}
 
-  .un-handle-layout {
-    margin-top: 20px;
-    border: 1px solid #DCDFE6;
-  }
+.un-handle-layout {
+  margin-top: 20px;
+  border: 1px solid #dcdfe6;
+}
 
-  .layout-title {
-    color: #606266;
-    padding: 15px 20px;
-    background: #F2F6FC;
-    font-weight: bold;
-  }
+.layout-title {
+  color: #606266;
+  padding: 15px 20px;
+  background: #f2f6fc;
+  font-weight: bold;
+}
 
-  .un-handle-content {
-    padding: 20px 40px;
-  }
+.un-handle-content {
+  padding: 20px 40px;
+}
 
-  .un-handle-item {
-    border-bottom: 1px solid #EBEEF5;
-    padding: 10px;
-  }
+.un-handle-item {
+  border-bottom: 1px solid #ebeef5;
+  padding: 10px;
+}
 
-  .overview-layout {
-    margin-top: 20px;
-  }
+.overview-layout {
+  margin-top: 20px;
+}
 
-  .overview-item-value {
-    font-size: 24px;
-    text-align: center;
-  }
+.overview-item-value {
+  font-size: 24px;
+  text-align: center;
+}
 
-  .overview-item-title {
-    margin-top: 10px;
-    text-align: center;
-  }
+.overview-item-title {
+  margin-top: 10px;
+  text-align: center;
+}
 
-  .out-border {
-    border: 1px solid #DCDFE6;
-  }
+.out-border {
+  border: 1px solid #dcdfe6;
+}
 
-  .statistics-layout {
-    margin-top: 20px;
-    border: 1px solid #DCDFE6;
-  }
-  .mine-layout {
-    position: absolute;
-    right: 140px;
-    top: 107px;
-    width: 250px;
-    height: 235px;
-  }
-  .address-content{
-    padding: 20px;
-    font-size: 18px
-  }
+.statistics-layout {
+  margin-top: 20px;
+  border: 1px solid #dcdfe6;
+}
+.mine-layout {
+  position: absolute;
+  right: 140px;
+  top: 107px;
+  width: 250px;
+  height: 235px;
+}
+.address-content {
+  padding: 20px;
+  font-size: 18px;
+}
 </style>

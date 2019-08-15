@@ -103,10 +103,10 @@
         <el-card shadow="never" class="cardBg">
           <div v-for="(item, index) in selectProductAttrPics" :key="index">
             <span>{{ item.name }}:</span>
-            <!-- <single-upload
+            <single-upload
               v-model="item.pic"
               style="width: 300px;display: inline-block;margin-left: 10px"
-            />-->
+            />
           </div>
         </el-card>
       </el-form-item>
@@ -135,7 +135,7 @@
         </el-card>
       </el-form-item>
       <el-form-item label="商品相册：">
-        <!-- <multi-upload v-model="selectProductPics" /> -->
+        <multi-upload v-model="selectProductPics" />
       </el-form-item>
       <el-form-item label="规格参数：">
         <el-tabs v-model="activeHtmlName" type="card">
@@ -158,13 +158,13 @@
 <script>
 import { attrCategoryList } from '@/api/productAttrCate'
 import { prodAttrList } from '@/api/productAttr'
-// import SingleUpload from '@/components/Upload/singleUpload'
-// import MultiUpload from '@/components/Upload/multiUpload'
+import SingleUpload from '@/components/Upload/singleUpload'
+import MultiUpload from '@/components/Upload/multiUpload'
 import Tinymce from '@/components/Tinymce'
 
 export default {
   name: 'ProductAttrDetail',
-  components: { Tinymce },
+  components: { Tinymce, SingleUpload, MultiUpload },
   props: {
     value: {
       type: Object,
@@ -297,6 +297,7 @@ export default {
               values: values,
               options: options
             })
+            console.log(this.selectProductAttr)
           }
           if (this.isEdit) {
             // 编辑模式下刷新商品属性图片
@@ -439,6 +440,7 @@ export default {
       this.value.skuStockList = []
       const skuList = this.value.skuStockList
       // 只有一个属性时
+      console.log(this.selectProductAttr)
       if (this.selectProductAttr.length === 1) {
         const values = this.selectProductAttr[0].values
         for (let i = 0; i < values.length; i++) {
@@ -496,6 +498,7 @@ export default {
     refreshProductAttrPics() {
       this.selectProductAttrPics = []
       if (this.selectProductAttr.length >= 1) {
+        console.log(this.selectProductAttr)
         const values = this.selectProductAttr[0].values
         for (let i = 0; i < values.length; i++) {
           let pic = null
@@ -505,6 +508,7 @@ export default {
           }
           this.selectProductAttrPics.push({ name: values[i], pic: pic })
         }
+        console.log(this.selectProductAttrPics)
       }
     },
     // 获取商品相关属性的图片

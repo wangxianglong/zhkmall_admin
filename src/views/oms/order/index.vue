@@ -42,13 +42,13 @@
               />
             </el-select>
           </el-form-item>
-          <el-form-item label="订单分类：">
+          <el-form-item label="订单类型：">
             <el-select v-model="listQuery.orderType" class="input-width" placeholder="全部" clearable>
               <el-option
-                v-for="item in orderTypeOptions"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value"
+                v-for="(item, index) in orderTypeOptions"
+                :key="index"
+                :label="item"
+                :value="index"
               />
             </el-select>
           </el-form-item>
@@ -84,24 +84,27 @@
         @selection-change="handleSelectionChange"
       >
         <el-table-column type="selection" width="60" align="center" />
-        <el-table-column label="订单编号" width="180" align="center" prop="orderSn" />
-        <el-table-column label="提交时间" width="180" align="center">
+        <el-table-column label="订单编号" align="center" prop="orderSn" />
+        <el-table-column label="提交时间" align="center">
           <template slot-scope="scope">{{ scope.row.createTime | formatCreateTime }}</template>
         </el-table-column>
-        <el-table-column label="用户账号" align="center" prop="memberUsername" />
-        <el-table-column label="订单金额" width="120" align="center">
+        <el-table-column label="用户账号" width="100" align="center" prop="memberUsername" />
+        <el-table-column label="订单金额" width="100" align="center">
           <template slot-scope="scope">￥{{ scope.row.totalAmount }}</template>
         </el-table-column>
-        <el-table-column label="支付方式" width="120" align="center">
+        <el-table-column label="支付方式" width="100" align="center">
           <template slot-scope="scope">{{ scope.row.payType | formatPayType }}</template>
         </el-table-column>
-        <el-table-column label="订单来源" width="120" align="center">
+        <el-table-column label="订单类型" width="100" align="center">
+          <template slot-scope="scope">{{ orderTypeOptions[scope.row.orderType] }}</template>
+        </el-table-column>
+        <el-table-column label="订单来源" width="100" align="center">
           <template slot-scope="scope">{{ scope.row.sourceType | formatSourceType }}</template>
         </el-table-column>
-        <el-table-column label="订单状态" width="120" align="center">
+        <el-table-column label="订单状态" width="100" align="center">
           <template slot-scope="scope">{{ scope.row.status | formatStatus }}</template>
         </el-table-column>
-        <el-table-column label="操作" width="200" align="center">
+        <el-table-column label="操作" width="220" align="center">
           <template slot-scope="scope">
             <el-button size="mini" @click="handleViewOrder(scope.$index, scope.row)">查看订单</el-button>
             <el-button
@@ -264,16 +267,7 @@ export default {
           value: 4
         }
       ],
-      orderTypeOptions: [
-        {
-          label: '正常订单',
-          value: 0
-        },
-        {
-          label: '秒杀订单',
-          value: 1
-        }
-      ],
+      orderTypeOptions: ['正常订单', '秒杀订单'],
       sourceTypeOptions: [
         {
           label: 'PC订单',
@@ -316,7 +310,10 @@ export default {
       this.multipleSelection = val
     },
     handleViewOrder(index, row) {
-      this.$router.push({ path: '/oms/orderDetail', query: { id: row.id }})
+      this.$router.push({
+        path: '/oms/orderDetail',
+        query: { id: row.id }
+      })
     },
     handleCloseOrder(index, row) {
       this.closeOrder.dialogVisible = true
@@ -324,7 +321,10 @@ export default {
     },
     handleDeliveryOrder(index, row) {
       const listItem = this.covertOrder(row)
-      this.$router.push({ path: '/oms/deliverOrderList', query: { list: [listItem] }})
+      this.$router.push({
+        path: '/oms/deliverOrderList',
+        query: { list: [listItem] }
+      })
     },
     handleViewLogistics(index, row) {
       this.logisticsDialogVisible = true
@@ -359,7 +359,10 @@ export default {
           })
           return
         }
-        this.$router.push({ path: '/oms/deliverOrderList', query: { list: list }})
+        this.$router.push({
+          path: '/oms/deliverOrderList',
+          query: { list: list }
+        })
       } else if (this.operateType === 2) {
         // 关闭订单
         this.closeOrder.orderIds = []

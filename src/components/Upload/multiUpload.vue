@@ -9,7 +9,7 @@
       :on-preview="handlePreview"
       :limit="maxCount"
       :on-exceed="handleExceed"
-      action="http://macro-oss.oss-cn-shenzhen.aliyuncs.com"
+      action="http://cross-mall.oss-cn-hangzhou.aliyuncs.com"
       list-type="picture-card"
     >
       <i class="el-icon-plus"/>

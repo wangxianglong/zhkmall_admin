@@ -27,7 +27,7 @@
       </el-form-item>
       <el-form-item label="品牌专区大图：">
         <el-upload
-          :http-request="fnUploadBigPicUrlUrl"
+          :http-request="fnUploadBigPicUrl"
           :show-file-list="true"
           :file-list="bigPicUrl"
           :on-remove="handleRemoveBigPic"
@@ -95,9 +95,6 @@ export default {
           { required: true, message: '请输入品牌名称', trigger: 'blur' },
           { min: 2, max: 140, message: '长度在 2 到 140 个字符', trigger: 'blur' }
         ],
-        logo: [
-          { required: true, message: '请输入品牌logo', trigger: 'blur' }
-        ],
         sort: [
           { type: 'number', message: '排序必须为数字' }
         ]
@@ -107,6 +104,11 @@ export default {
   created() {
     if (this.isEdit) {
       getBrand(this.$route.query.id).then(response => {
+        const data = response.data
+        this.logoUrl.push({ url: data.logo })
+        if (data.bigPic) {
+          this.bigPicUrl.push({ url: data.bigPic })
+        }
         this.brand = response.data
       })
     } else {
@@ -171,9 +173,9 @@ export default {
         this.logoUrl = [{ url: res.fileUrl }]
       })
     },
-    async fnUploadBigPicUrlUrl(option) {
+    async fnUploadBigPicUrl(option) {
       oss.ossUploadFile(option).then(res => {
-        this.bigPicUrlUrl = [{ url: res.fileUrl }]
+        this.bigPicUrl = [{ url: res.fileUrl }]
       })
     },
     beforeAvatarUpload(file) {
