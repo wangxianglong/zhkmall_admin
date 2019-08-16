@@ -12,23 +12,26 @@
         :data="list"
         style="width: 100%"
         border
+        stripe
         @selection-change="handleSelectionChange"
       >
         <el-table-column type="selection" width="60" align="center" />
-        <!-- <el-table-column label="ID" prop="id" width="100" align="center" sortable /> -->
+        <el-table-column align="center" width="80" label="排序" prop="sort" sortable />
         <el-table-column label="属性名称" prop="name" width="100" align="center" />
-        <el-table-column label="商品类型" width="140" align="center">
-          <template>{{ $route.query.cname }}</template>
+        <el-table-column label="商品类型" width="120" align="center">
+          <template slot-scope="scope">{{ scope.row.cname }}</template>
         </el-table-column>
-        <el-table-column label="属性是否可选" width="120" align="center">
+        <el-table-column label="属性是否可选" align="center">
           <template slot-scope="scope">{{ scope.row.selectType|selectTypeFilter }}</template>
         </el-table-column>
-        <el-table-column label="属性值的录入方式" width="150" align="center">
+        <el-table-column label="属性值的录入方式" align="center">
           <template slot-scope="scope">{{ scope.row.inputType|inputTypeFilter }}</template>
         </el-table-column>
-        <el-table-column label="可选值列表" prop="inputList" width="100" align="center" />
-        <el-table-column label="参数值" prop="value" align="center" />
-        <el-table-column label="操作" align="center">
+        <el-table-column label="检索类型" align="center">
+          <template slot-scope="scope">{{ searchTypeOption[scope.row.searchType] }}</template>
+        </el-table-column>
+        <el-table-column label="可选值列表" prop="inputList" min-width="100" align="center" />
+        <el-table-column label="操作" width="180" align="center">
           <template slot-scope="scope">
             <el-button size="mini" type="primary" @click="handleUpdate(scope.$index, scope.row)">编辑</el-button>
             <el-button size="mini" type="danger" @click="handleDelete(scope.$index, scope.row)">删除</el-button>
@@ -56,7 +59,7 @@
   </div>
 </template>
 <script>
-import { prodAttrList, deleteProductAttr } from '@/api/productAttr'
+import { cidToProdAttrList, deleteProductAttr } from '@/api/productAttr'
 
 export default {
   name: 'ProductAttrList',
@@ -88,6 +91,9 @@ export default {
         pageSize: 10,
         type: this.$route.query.type
       },
+      cname: this.$route.query.cnam,
+      cid: this.$route.query.cid,
+      searchTypeOption: ['不需要进行检索', '关键字检索', '范围检索'],
       operateType: null,
       multipleSelection: [],
       operates: [
@@ -104,21 +110,20 @@ export default {
   methods: {
     getList() {
       this.listLoading = true
-      const params = {
-        pageNum: this.listQuery.pageNum,
-        pageSize: this.listQuery.pageSize,
-        value: this.$route.query.cid
-      }
-      prodAttrList(params).then(response => {
+      cidToProdAttrList(this.cid, this.listQuery).then(response => {
         this.listLoading = false
-        this.list = response.data.list
-        this.total = response.data.total
+        const data = response.data
+        data.list.forEach(item => {
+          item.cname = this.cname
+        })
+        this.list = data.list
+        this.total = data.total
       })
     },
     addProductAttr() {
       this.$router.push({
         path: '/pms/addProductAttr',
-        query: { cid: this.$route.query.cid, type: this.$route.query.type }
+        query: { cid: this.cid, type: this.listQuery.type }
       })
     },
     handleSelectionChange(val) {

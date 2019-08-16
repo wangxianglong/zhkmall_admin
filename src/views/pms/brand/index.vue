@@ -26,6 +26,7 @@
         :data="list"
         style="width: 100%"
         border
+        stripe
         @selection-change="handleSelectionChange"
       >
         <el-table-column type="selection" width="60" align="center" />

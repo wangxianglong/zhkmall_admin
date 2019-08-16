@@ -47,7 +47,23 @@
         </el-radio-group>
       </el-form-item>
       <el-form-item label="属性值可选值列表:">
-        <el-input v-model="inputListFormat" :autosize="true" type="textarea" />
+        <el-tag
+          v-for="tag in dynamicTags"
+          :key="tag"
+          :disable-transitions="false"
+          closable
+          @close="handleClose(tag)"
+        >{{ tag }}</el-tag>
+        <el-input
+          v-if="inputVisible"
+          ref="saveTagInput"
+          v-model="inputValue"
+          class="input-new-tag"
+          size="small"
+          @keyup.enter.native="handleInputConfirm"
+          @blur="handleInputConfirm"
+        />
+        <el-button v-else class="button-new-tag" size="small" @click="showInput">添加属性</el-button>
       </el-form-item>
       <el-form-item label="是否支持手动新增:">
         <el-radio-group v-model="productAttr.handAddStatus">
@@ -59,8 +75,9 @@
         <el-input v-model="productAttr.sort" />
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" @click="onSubmit('productAttrFrom')">提交</el-button>
+        <el-button @click="$router.back(-1)">返回</el-button>
         <el-button v-if="!isEdit" @click="resetForm('productAttrFrom')">重置</el-button>
+        <el-button type="primary" @click="onSubmit('productAttrFrom')">提交</el-button>
       </el-form-item>
     </el-form>
   </el-card>
@@ -101,22 +118,14 @@ export default {
         ]
       },
       productAttrCateList: null,
-      inputListFormat: null
-    }
-  },
-  watch: {
-    inputListFormat: function(newValue, oldValue) {
-      newValue = newValue.replace(/\n/g, ',')
-      this.productAttr.inputList = newValue
+      dynamicTags: [],
+      inputVisible: false,
+      inputValue: ''
     }
   },
   created() {
     if (this.isEdit) {
-      console.log(this.$route.query.id)
-      getProductAttr(this.$route.query.id).then(response => {
-        this.productAttr = response.data
-        this.inputListFormat = this.productAttr.inputList.replace(/,/g, '\n')
-      })
+      this.getProductAttrDetail()
     } else {
       this.resetProductAttr()
     }
@@ -129,9 +138,34 @@ export default {
         this.productAttrCateList = response.data.list
       })
     },
+    getProductAttrDetail() {
+      getProductAttr(this.$route.query.id).then(response => {
+        const data = response.data
+        this.dynamicTags = data.inputList.split(',')
+        this.productAttr = data
+      })
+    },
+    handleClose(tag) {
+      this.dynamicTags.splice(this.dynamicTags.indexOf(tag), 1)
+    },
+    showInput() {
+      this.inputVisible = true
+      this.$nextTick(_ => {
+        this.$refs.saveTagInput.$refs.input.focus()
+      })
+    },
+    handleInputConfirm() {
+      const inputValue = this.inputValue
+      if (inputValue) {
+        this.dynamicTags.push(inputValue)
+      }
+      this.inputVisible = false
+      this.inputValue = ''
+    },
     resetProductAttr() {
       this.productAttr = Object.assign({}, defaultProductAttr)
       this.productAttr.productAttributeCategoryId = Number(this.$route.query.cid)
+      this.dynamicTags = []
       this.productAttr.type = Number(this.$route.query.type)
     },
     onSubmit(formName) {
@@ -142,6 +176,7 @@ export default {
             cancelButtonText: '取消',
             type: 'warning'
           }).then(() => {
+            this.productAttr.inputList = this.dynamicTags.join(',')
             if (this.isEdit) {
               updateProductAttr(this.$route.query.id, this.productAttr).then(response => {
                 this.$message({
@@ -181,4 +216,19 @@ export default {
 </script>
 
 <style scoped>
+.el-tag + .el-tag {
+  margin-left: 10px;
+}
+.button-new-tag {
+  margin-left: 10px;
+  height: 32px;
+  line-height: 30px;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+.input-new-tag {
+  width: 90px;
+  margin-left: 10px;
+  vertical-align: bottom;
+}
 </style>

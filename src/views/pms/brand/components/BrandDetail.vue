@@ -56,6 +56,7 @@
         </el-radio-group>
       </el-form-item>
       <el-form-item>
+        <el-button @click="$router.back(-1)">返回</el-button>
         <el-button v-if="!isEdit" @click="resetForm('brandFrom')">重置</el-button>
         <el-button type="primary" @click="onSubmit('brandFrom')">提交</el-button>
       </el-form-item>
@@ -154,7 +155,7 @@ export default {
                   type: 'success',
                   duration: 1000
                 })
-                this.$router.back()
+                this.resetForm('brandFrom')
               })
             }
           })

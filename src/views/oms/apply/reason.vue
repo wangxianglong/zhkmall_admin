@@ -11,6 +11,7 @@
         ref="returnReasonTable"
         :data="list"
         border
+        stripe
         style="width: 100%;"
         @selection-change="handleSelectionChange"
       >

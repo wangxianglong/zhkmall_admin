@@ -10,8 +10,9 @@
         v-loading="listLoading"
         ref="productAttrCateTable"
         :data="list"
-        style="width: 100%"
+        stripe
         border
+        style="width: 100%"
       >
         <el-table-column label="类型名称" align="center" prop="name" />
         <el-table-column label="属性数量" align="center">

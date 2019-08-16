@@ -51,6 +51,7 @@
         />
       </el-form-item>
       <el-form-item>
+        <el-button @click="$router.back(-1)">返回</el-button>
         <el-button type="primary" @click="onSubmit('homeAdvertiseFrom')">提交</el-button>
         <el-button v-if="!isEdit" @click="resetForm('homeAdvertiseFrom')">重置</el-button>
       </el-form-item>

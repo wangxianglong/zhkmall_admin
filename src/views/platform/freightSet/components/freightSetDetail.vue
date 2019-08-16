@@ -92,6 +92,7 @@
         <el-input v-model="productCate.description" :rows="4" type="textarea" />
       </el-form-item>
       <el-form-item>
+        <el-button @click="$router.back(-1)">返回</el-button>
         <el-button v-if="!isEdit" @click="resetForm('productCateFrom')">重置</el-button>
         <el-button type="primary" @click="onSubmit('productCateFrom')">提交</el-button>
       </el-form-item>

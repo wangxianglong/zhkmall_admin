@@ -4,7 +4,7 @@
       ref="productAttrForm"
       :model="value"
       label-width="120px"
-      style="width: 720px"
+      style="width: 920px"
       size="small"
     >
       <el-form-item label="属性类型：">
@@ -66,7 +66,9 @@
             v-for="(item,index) in selectProductAttr"
             :label="item.name"
             :key="item.id"
+            stripe
             align="center"
+            width="80"
           >
             <template slot-scope="scope">{{ getProductSkuSp(scope.row,index) }}</template>
           </el-table-column>
@@ -80,7 +82,7 @@
               <el-input v-model="scope.row.stock" />
             </template>
           </el-table-column>
-          <el-table-column label="库存预警值" width="80" align="center">
+          <el-table-column label="库存预警值" width="100" align="center">
             <template slot-scope="scope">
               <el-input v-model="scope.row.lowStock" />
             </template>
@@ -157,7 +159,7 @@
 
 <script>
 import { attrCategoryList } from '@/api/productAttrCate'
-import { prodAttrList } from '@/api/productAttr'
+import { cidToProdAttrList } from '@/api/productAttr'
 import SingleUpload from '@/components/Upload/singleUpload'
 import MultiUpload from '@/components/Upload/multiUpload'
 import Tinymce from '@/components/Tinymce'
@@ -273,8 +275,8 @@ export default {
       })
     },
     getProductAttrList(type, cid) {
-      const param = { pageNum: 1, pageSize: 100, value: cid }
-      prodAttrList(param).then(response => {
+      const param = { pageNum: 1, pageSize: 100, type: type }
+      cidToProdAttrList(cid, param).then(response => {
         const list = response.data.list
         if (type === 0) {
           this.selectProductAttr = []
@@ -297,7 +299,6 @@ export default {
               values: values,
               options: options
             })
-            console.log(this.selectProductAttr)
           }
           if (this.isEdit) {
             // 编辑模式下刷新商品属性图片
@@ -440,7 +441,6 @@ export default {
       this.value.skuStockList = []
       const skuList = this.value.skuStockList
       // 只有一个属性时
-      console.log(this.selectProductAttr)
       if (this.selectProductAttr.length === 1) {
         const values = this.selectProductAttr[0].values
         for (let i = 0; i < values.length; i++) {
@@ -500,13 +500,14 @@ export default {
       if (this.selectProductAttr.length >= 1) {
         console.log(this.selectProductAttr)
         const values = this.selectProductAttr[0].values
+        const attrId = this.selectProductAttr[0].id
         for (let i = 0; i < values.length; i++) {
           let pic = null
           if (this.isEdit) {
             // 编辑状态下获取图片
             pic = this.getProductSkuPic(values[i])
           }
-          this.selectProductAttrPics.push({ name: values[i], pic: pic })
+          this.selectProductAttrPics.push({ id: attrId + i, name: values[i], pic: pic })
         }
         console.log(this.selectProductAttrPics)
       }

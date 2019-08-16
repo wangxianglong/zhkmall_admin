@@ -73,6 +73,7 @@
         <el-input :rows="2" v-model="productCate.description" type="textarea" />
       </el-form-item>
       <el-form-item>
+        <el-button @click="$router.back(-1)">返回</el-button>
         <el-button v-if="!isEdit" @click="resetForm('productCateFrom')">重置</el-button>
         <el-button type="primary" @click="onSubmit('productCateFrom')">提交</el-button>
       </el-form-item>
@@ -140,31 +141,17 @@ export default {
   created() {
     if (this.isEdit) {
       getProductCate(this.$route.query.id).then(response => {
-        const data = response.data
-        data.productAttributeIdList = [2, 33]
+        const data = response.data[0]
         this.productCate = data
         if (data.icon) {
           this.picUrl.push({ url: data.icon })
         }
-        if (data.productAttributeIdList.length > 0) {
-          const attrList = []
-          data.productAttributeIdList.forEach(item => {
-            attrList.push({ value: item })
+        if (data.productAttrInfoList.length > 0) {
+          this.filterProductAttrList = data.productAttrInfoList.map((value, key, arr) => {
+            return { value: [value.attributeCategoryId, value.attributeId] }
           })
-          this.filterProductAttrList = attrList
         }
       })
-      // getProductAttrInfo(this.$route.query.id).then(response => {
-      //   if (response.data != null && response.data.length > 0) {
-      //     this.filterProductAttrList = []
-      //     for (let i = 0; i < response.data.length; i++) {
-      //       this.filterProductAttrList.push({
-      //         key: Date.now() + i,
-      //         value: [response.data[i].attributeCategoryId, response.data[i].attributeId]
-      //       })
-      //     }
-      //   }
-      // })
     } else {
       this.productCate = Object.assign({}, defaultProductCate)
     }
@@ -252,7 +239,7 @@ export default {
                   type: 'success',
                   duration: 1500
                 })
-                this.$router.back()
+                this.resetForm('productCateFrom')
               })
             }
           })

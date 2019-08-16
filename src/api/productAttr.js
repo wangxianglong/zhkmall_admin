@@ -8,6 +8,15 @@ export function prodAttrList(params) {
   })
 }
 
+// 获取商品属性列表
+export function cidToProdAttrList(cid, params) {
+  return request({
+    url: `/productAttribute/list/${cid}`,
+    method: 'get',
+    params: params
+  })
+}
+
 export function deleteProductAttr(data) {
   return request({
     url: '/productAttribute/delete',

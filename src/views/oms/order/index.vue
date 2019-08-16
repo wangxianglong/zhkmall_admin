@@ -26,10 +26,12 @@
           <el-form-item label="提交时间：">
             <el-date-picker
               v-model="listQuery.createTime"
-              class="input-width"
-              value-format="yyyy-MM-dd"
-              type="date"
-              placeholder="请选择时间"
+              :picker-options="pickerOptions"
+              clearable
+              value-format="yyyy-MM-dd HH:mm:ss"
+              type="datetime"
+              placeholder="选择日期时间"
+              align="right"
             />
           </el-form-item>
           <el-form-item label="订单状态：">
@@ -80,6 +82,7 @@
         ref="orderTable"
         :data="list"
         border
+        stripe
         style="width: 100%;"
         @selection-change="handleSelectionChange"
       >
@@ -88,20 +91,20 @@
         <el-table-column label="提交时间" align="center">
           <template slot-scope="scope">{{ scope.row.createTime | formatCreateTime }}</template>
         </el-table-column>
-        <el-table-column label="用户账号" width="100" align="center" prop="memberUsername" />
-        <el-table-column label="订单金额" width="100" align="center">
+        <el-table-column label="用户账号" align="center" prop="memberUsername" />
+        <el-table-column label="订单金额" align="center">
           <template slot-scope="scope">￥{{ scope.row.totalAmount }}</template>
         </el-table-column>
-        <el-table-column label="支付方式" width="100" align="center">
+        <el-table-column label="支付方式" align="center">
           <template slot-scope="scope">{{ scope.row.payType | formatPayType }}</template>
         </el-table-column>
-        <el-table-column label="订单类型" width="100" align="center">
+        <el-table-column label="订单类型" align="center">
           <template slot-scope="scope">{{ orderTypeOptions[scope.row.orderType] }}</template>
         </el-table-column>
-        <el-table-column label="订单来源" width="100" align="center">
+        <el-table-column label="订单来源" align="center">
           <template slot-scope="scope">{{ scope.row.sourceType | formatSourceType }}</template>
         </el-table-column>
-        <el-table-column label="订单状态" width="100" align="center">
+        <el-table-column label="订单状态" align="center">
           <template slot-scope="scope">{{ scope.row.status | formatStatus }}</template>
         </el-table-column>
         <el-table-column label="操作" width="220" align="center">
@@ -292,7 +295,29 @@ export default {
           value: 3
         }
       ],
-      logisticsDialogVisible: false
+      logisticsDialogVisible: false,
+      pickerOptions: {
+        shortcuts: [{
+          text: '今天',
+          onClick(picker) {
+            picker.$emit('pick', new Date())
+          }
+        }, {
+          text: '昨天',
+          onClick(picker) {
+            const date = new Date()
+            date.setTime(date.getTime() - 3600 * 1000 * 24)
+            picker.$emit('pick', date)
+          }
+        }, {
+          text: '一周前',
+          onClick(picker) {
+            const date = new Date()
+            date.setTime(date.getTime() - 3600 * 1000 * 24 * 7)
+            picker.$emit('pick', date)
+          }
+        }]
+      }
     }
   },
   created() {

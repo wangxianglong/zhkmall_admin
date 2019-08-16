@@ -18,8 +18,9 @@
         v-loading="listLoading"
         ref="productCateTable"
         :data="list"
-        style="width: 100%"
         border
+        stripe
+        style="width: 100%"
       >
         <el-table-column align="center" width="80" label="排序" prop="sort" sortable />
         <el-table-column align="center" label="分类名称" prop="name" />

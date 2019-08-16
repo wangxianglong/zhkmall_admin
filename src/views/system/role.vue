@@ -37,6 +37,7 @@
         element-loading-text="正在查询中。。。"
         border
         fit
+        stripe
         highlight-current-row
         @selection-change="selectRow"
       >

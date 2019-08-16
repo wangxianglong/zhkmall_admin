@@ -1,5 +1,5 @@
 <template>
-  <el-card class="form-container" shadow="never">
+  <el-card class="form-container" style="width: 1000px;" shadow="never">
     <el-steps :active="active" finish-status="success" align-center>
       <el-step title="填写商品信息" />
       <el-step title="填写商品促销" />

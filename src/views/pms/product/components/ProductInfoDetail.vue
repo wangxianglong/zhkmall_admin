@@ -117,12 +117,14 @@ export default {
       this.handleEditCreated()
     },
     selectProductCateValue: function(newValue) {
-      if (newValue != null && newValue.length === 2) {
-        this.value.productCategoryId = newValue[1]
-        this.value.productCategoryName = this.getCateNameById(this.value.productCategoryId)
-      } else {
-        this.value.productCategoryId = null
-        this.value.productCategoryName = null
+      if (this.value) {
+        if (newValue != null && newValue.length === 2) {
+          this.value.productCategoryId = newValue[1]
+          this.value.productCategoryName = this.getCateNameById(this.value.productCategoryId)
+        } else {
+          this.value.productCategoryId = null
+          this.value.productCategoryName = null
+        }
       }
     }
   },

@@ -35,6 +35,7 @@
         element-loading-text="正在查询中。。。"
         border
         fit
+        stripe
         highlight-current-row
       >
         <!-- <el-table-column align="center" width="100px" label="用户ID" prop="id" sortable /> -->
